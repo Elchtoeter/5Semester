@@ -353,8 +353,6 @@ public final class ScannerImpl extends Scanner {
         }
         try {
             token.val = Integer.parseInt(sb.toString());
-            if (token.val == Integer.MIN_VALUE)
-                throw new NumberFormatException("Integer.MIN_VALUE not allowed in MicroJava");
         } catch (NumberFormatException e) {
             error(token, Errors.Message.BIG_NUM, sb.toString());
         }
