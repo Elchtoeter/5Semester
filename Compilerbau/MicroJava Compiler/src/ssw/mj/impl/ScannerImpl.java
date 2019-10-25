@@ -42,7 +42,7 @@ public final class ScannerImpl extends Scanner {
 
     @Override
     public Token next() {
-        while (ch == ' ' || ch == '\r' || ch == '\n' || ch == '\t') nextCh();
+        while (Character.isWhitespace(ch)) nextCh();
         Token token = new Token(none, line, col);
 
         switch (ch) {
@@ -347,7 +347,7 @@ public final class ScannerImpl extends Scanner {
 
     private void readNumber(Token token) {
         StringBuilder sb = new StringBuilder();
-        while ('0' <= ch && ch <= '9') {
+        while (Character.isDigit(ch)) {
             sb.append(ch);
             nextCh();
         }
@@ -361,7 +361,7 @@ public final class ScannerImpl extends Scanner {
 
     private void readName(Token token) {
         StringBuilder sb = new StringBuilder();
-        while ('a' <= ch && ch <= 'z' || 'A' <= ch && ch <= 'Z' || '0' <= ch && ch <= '9' || ch == '_') {
+        while (Character.isLetterOrDigit(ch) || ch == '_') {
             sb.append(ch);
             nextCh();
         }
