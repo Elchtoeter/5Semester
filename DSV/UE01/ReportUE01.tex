@@ -1,0 +1,30 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage[utf8]{inputenc}
+\author{ Bernhard Fürst \\ k0442418 \and Sebastian Ortner \\ kxxxxxxxxx}
+\title{Report Übung 01}
+\date{\today}
+\begin{document}
+    \maketitle
+    \section*{3}
+    Der Durchschnitt unserer Dreiecksfunktion ist $0$ was leicht anhand der Symmetrie bezüglich der x-Achse gesehen werden kann. Damit ist auch der DC-Anteil der Fourierreihe, $a_0$, $0$.
+    Dies kann auch folgendermassen gezeigt werden :
+    
+    \begin{eqnarray*}
+        a_{0} &=\frac{1}{T}\int_{0}^{T}f(t)dt 
+    \end{eqnarray*}
+
+Aufgrund der Symmetrie in der Funktion erkennen wir dass das Integral von $0$ nach $\frac{T_0}{2}$ gleich dem Integral von $\frac{T_0}{2}$ nach $T_0$ sein muss. Daher können wir sagen dass :
+\begin{equation}
+    a_0=\frac{2}{T_0}\int_{0}^{\frac{T_0}{2}}f(t)dt
+\end{equation}
+
+Da wir uns nun auf einen Teil der 2 teiligen Funktion beschränken können gilt :
+\begin{eqnarray*}
+    a_0=&\frac{2}{T_0}\int_{0}^{\frac{T_0}{2}}A-\frac{4A}{T_0}tdt \\
+    =&\frac{2}{T_0}(At-\frac{4A}{T_0}\frac{t^2}{2})\big |_0^{\frac{T_0}{2}}\\
+    =&\frac{2}{T_0}(A\frac{T_0}{2}-\frac{2A\frac{T_0^2}{4}}{T_0}-A0-\frac{2A\frac{0}{4}}{T_0})\\
+    =&\frac{2}{T_0}(A\frac{T_0}{2}-\frac{AT_0^2}{2T_0}-0-0)\\
+    =&\frac{2}{T_0}(A\frac{T_0}{2}-A\frac{T_0}{2}-0) \\ =& \underline{0}
+\end{eqnarray*}
+\end{document}
