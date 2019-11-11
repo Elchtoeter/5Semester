@@ -6,6 +6,19 @@
 \date{\today}
 \begin{document}
     \maketitle
+    \section*{1}
+    \subsection*{a}
+    \subsection*{b}
+    \begin{itemize}
+        \item $x_3 \rightarrow f_0 = \frac{\frac{2\pi}{64}}{1} \Rightarrow  \Omega_0 = \frac{2\pi}{64}$
+        \item $x_4 \rightarrow f_0 = \frac{9}{64*2\pi} \Rightarrow \frac{9}{64}$
+    \end{itemize}
+    \subsection*{c}
+    \begin{itemize}
+        \item $x_3$ ist periodisch, die Periodendauer ist abzulesen bei x= 64.
+        \item $x_4 \rightarrow n = \frac{2\pi k}{\frac{9}{64}}\Rightarrow \frac{2\pi * 64 k}{9}$ \\k müsste eine irrationale Zahl sein damit n ein Element aus den ganzen Zahlen ist. Zu diesem diskreten Punkt gibt es keine Periodendauer. 
+    \end{itemize}
+    \subsection*{d}
     \section*{3}
     Der Durchschnitt unserer Dreiecksfunktion ist $0$ was leicht anhand der Symmetrie bezüglich der x-Achse gesehen werden kann. Damit ist auch der DC-Anteil der Fourierreihe, $a_0$, $0$.
     Dies kann auch folgendermassen gezeigt werden :
@@ -16,10 +29,10 @@
 
 Aufgrund der Symmetrie in der Funktion erkennen wir dass das Integral von $0$ nach $\frac{T_0}{2}$ gleich dem Integral von $\frac{T_0}{2}$ nach $T_0$ sein muss. Daher können wir sagen dass :
 \begin{equation}
-    a_0=\frac{2}{T_0}\int_{0}^{\frac{T_0}{2}}f(t)dt
+    a_0=\frac{2}{T_0}\int_{0}^{\frac{T_0}{2}}f(t)dt 
 \end{equation}
 
-Da wir uns nun auf einen Teil der 2 teiligen Funktion beschränken können gilt :
+Wir können uns nun auf einen Teil der zweiteiligen Funktion beschränken. Da die Funktion an der Strecke von $0$ nach $\frac{T}{2}$ die Form $A-\frac{4A}{T}$ hat gilt :
 \begin{eqnarray*}
     a_0=&\frac{2}{T_0}\int_{0}^{\frac{T_0}{2}}A-\frac{4A}{T_0}tdt \\
     =&\frac{2}{T_0}(At-\frac{4A}{T_0}\frac{t^2}{2})\big |_0^{\frac{T_0}{2}}\\
@@ -27,4 +40,46 @@ Da wir uns nun auf einen Teil der 2 teiligen Funktion beschränken können gilt 
     =&\frac{2}{T_0}(A\frac{T_0}{2}-\frac{AT_0^2}{2T_0}-0-0)\\
     =&\frac{2}{T_0}(A\frac{T_0}{2}-A\frac{T_0}{2}-0) \\ =& \underline{0}
 \end{eqnarray*}
-\end{document}
+
+\pagebreak
+
+    Um $a_n$ zu finden können wir, wieder aufgrund der oben festgestellten Symmetrie, folgenden Term evaluieren :
+    \begin{eqnarray*}
+        a_n = & \frac{4}{T}\int_{0}^{\frac{T}{2}}f(t)\cos\omega ntdt\\
+        =&\frac{4}{T}\int_{0}^{\frac{T}{2}}(A-\frac{4A}{T}t)\cos\omega ntdt \\
+        =&\frac{A4}{T}\int_{0}^{\frac{T}{2}}(1-\frac{4}{T}t)\cos\omega ntdt \\
+        =&\frac{A4}{T}(\int_{0}^{\frac{T}{2}}\cos\omega ntdt-\int_{0}^{\frac{T}{2}}\frac{4}{T}t\cos\omega ntdt)\\
+        =&\frac{A4}{T}((\frac{1}{\omega n}\sin\omega nt)\big |_0^{T}-\int_{0}^{\frac{T}{2}}\frac{4}{T}t\cos\omega ntdt)\\
+        =&\frac{A4}{T}((\frac{1}{\omega n}\sin\frac{2\pi}{T} n\frac{T}{2}-(\frac{1}{\omega nt}\sin\frac{2\pi}{T} n 0)-\int_{0}^{\frac{T}{2}}\frac{4}{T}t\cos\omega ntdt)\\
+        =&\frac{A4}{T}((\frac{1}{\omega n}\sin \pi n- 0 -\int_{0}^{\frac{T}{2}}\frac{4}{T}t\cos\omega ntdt)
+    \end{eqnarray*}
+    Ganzzahlige Vielfache von pi ergeben immer einen Sinus von 0.
+    \begin{eqnarray*}
+        a_n = & \frac{A4}{T}(0 - 0 -\int_{0}^{\frac{T}{2}}\frac{4}{T}t\cos\omega ntdt)\\
+         = & \frac{A4}{T}\int_{0}^{\frac{T}{2}}\frac{-4}{T}t\cos\omega ntdt\\
+         = & \frac{-16A}{T^2}\int_{0}^{\frac{T}{2}}t\cos\omega ntdt\\
+         = & \frac{-16A}{T^2}((t \frac{1}{\omega n}\sin \omega n t)\big |_0^\frac{T}{2}-\int_0^{\frac{T}{2}}\frac{1}{\omega n}\sin \omega ntdt)\\
+         = & \frac{-16A}{T^2}(( \frac{\frac{T}{2}}{\omega n}\sin \frac{2\pi}{T} n \frac{T}{2} - \frac{1}{\omega n}\sin 0) -\int_0^{\frac{T}{2}}\frac{1}{\omega n}\sin \omega ntdt)\\
+         = & \frac{-16A}{T^2}(( \frac{\frac{T}{2}}{\omega n}\sin \pi n -  0) -\int_0^{\frac{T}{2}}\frac{1}{\omega n}\sin \omega ntdt)\\
+         = & \frac{-16A}{T^2}( 0 -\int_0^{\frac{T}{2}}\frac{1}{\omega n}\sin \omega ntdt)\\
+         = & \frac{16A}{T^2}(\frac{-1}{\omega^2 n^2}\cos\omega n t )\big |_0^{\frac{T}{2}}\\
+         = & \frac{16A}{T^2}\frac{1}{\omega^2 n^2}(-\cos\omega n t )\big |_0^{\frac{T}{2}}\\
+         = & \frac{4A}{\pi^2 n^2}(-\cos\frac{2\pi}{T}n\frac{T}{2}+\cos 0)\\
+         = & \frac{4A}{\pi^2 n^2}(-\cos\pi n + 1)
+    \end{eqnarray*}
+
+    Bei ungeraden Werten von n evaluiert dieser Term zu $\frac{8A}{\pi^2 n^2}$ bei geraden zu $0$ da der Cosinus bei ungeraden Vielfachen von $\pi -1$ annimmt und bei geraden 1. 
+
+
+    Der Faktor $b_n$ ist bei geraden periodischen Funktionen, d.h. periodischen Funktionen die symmetrisch zur y-Achse sind, immer 0.
+    
+    Eingesetzt in die Fourierreihe erhalten wir nun.
+
+    \begin{eqnarray*}
+        x(t) = &  \sum_{n=1}^\infty \frac{8A}{\pi^2 (2n-1)^2}\cos(2\pi (2n-1) f_0 t)
+        =& \frac{8A}{\pi^2}\sum_{n=1}^\infty\frac{\cos(2\pi (2n-1) f_0 t)}{(2n-1)^2}
+    \end{eqnarray*}
+
+    $n$ schreitet voran als $2n-1$ da wir nur an ungeraden Werten interessiert sind.
+
+    \end{document}
