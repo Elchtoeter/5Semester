@@ -340,6 +340,7 @@ public class ParserTest extends CompilerTestCaseSupport {
 		parseAndVerify();
 	}
 
+	@Test
 	public void compareExpressions() {
 		init("program Test" + LF + //
 				"  {" + LF + //

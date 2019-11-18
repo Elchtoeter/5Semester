@@ -16,7 +16,7 @@ import at.jku.cp.ai.rau.nodes.IBoardNode;
 import at.jku.cp.ai.rau.objects.Move;
 import at.jku.cp.ai.search.Node;
 import at.jku.cp.ai.search.Search;
-import at.jku.cp.ai.search.algorithms.BFS;
+import at.jku.cp.ai.search.algorithms.BFS1;
 import at.jku.cp.ai.search.algorithms.DLDFS;
 import at.jku.cp.ai.search.algorithms.IDS;
 import at.jku.cp.ai.utils.PathUtils;
@@ -29,7 +29,7 @@ public class TestUninformedSearchersEdgecases {
 	
 	@Test
 	public void bfsNoInfiniteLoop() {
-		noInfiniteLoop(new BFS());
+		noInfiniteLoop(new BFS1());
 	}
 	
 	@Test

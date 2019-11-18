@@ -17,10 +17,12 @@ public class IDS implements Search
 	}
 
 	@Override
-	public Node search(Node start, Predicate<Node> endPredicate)
-	{
-		// TODO, assignment1
-		return null;
+	public Node search(Node start, Predicate<Node> endPredicate) {
+		Node result = null;
+		for (int depth = 0; depth <= limit && result == null; depth++) {
+			result = new DLDFS(depth).search(start, endPredicate);
+		}
+		return result;
 	}
 
 }

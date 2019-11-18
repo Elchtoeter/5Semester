@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 
+import at.jku.cp.ai.search.algorithms.BFS;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.Timeout;
@@ -24,7 +25,7 @@ import at.jku.cp.ai.rau.objects.Move;
 import at.jku.cp.ai.rau.objects.V;
 import at.jku.cp.ai.search.Node;
 import at.jku.cp.ai.search.Search;
-import at.jku.cp.ai.search.algorithms.BFS;
+import at.jku.cp.ai.search.algorithms.BFS1;
 import at.jku.cp.ai.search.algorithms.DLDFS;
 import at.jku.cp.ai.search.algorithms.IDS;
 import at.jku.cp.ai.utils.Constants;
