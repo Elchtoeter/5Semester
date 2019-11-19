@@ -21,9 +21,17 @@ public final class ParserImpl extends Parser {
     private static final EnumSet<Kind> firstTSRelOp = EnumSet.of
             (eql, neq, gtr, geq, lss, leq);
 
+    private static final EnumSet<Kind> catchDecl = EnumSet.of(eof,final_,class_,lbrace,semicolon);
+    private static final EnumSet<Kind> catchStat = EnumSet.of(eof,if_,while_,break_,compare_,read,print,semicolon);
+
+
+    private static final int MIN_ERROR_DIST = 3;
+
+    private int errorDist;
 
     public ParserImpl(Scanner scanner) {
         super(scanner);
+        this.errorDist = MIN_ERROR_DIST;
     }
 
     @Override
@@ -45,6 +53,7 @@ public final class ParserImpl extends Parser {
         t = la;
         la = scanner.next();
         sym = la.kind;
+        errorDist++;
     }
 
     private void Program() {
@@ -151,7 +160,7 @@ public final class ParserImpl extends Parser {
 
     private void Block() {
         check(lbrace);
-        while (firstTSStatement.contains(sym))
+        while (sym != rbrace && sym != eof)
             Statement();
         check(rbrace);
     }
@@ -238,12 +247,20 @@ public final class ParserImpl extends Parser {
 				scan();
 				break;
 			default:
-				error(INVALID_STAT);
+				recoverStat();
 				break;
 		}
     }
 
-	private void Assignop() {
+    private void recoverStat() {
+        error(INVALID_STAT);
+        do {
+            scan();
+        }while (catchStat.contains(sym));
+        errorDist =0;
+    }
+
+    private void Assignop() {
         if (firstTSAssignOp.contains(sym))
             scan();
         else

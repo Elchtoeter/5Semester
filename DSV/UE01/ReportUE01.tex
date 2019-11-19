@@ -1,6 +1,32 @@
 \documentclass{article}
+\usepackage{svg}
 \usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{pgf}
 \usepackage[utf8]{inputenc}
+
+\usepackage{listings}
+\usepackage{color} %red, green, blue, yellow, cyan, magenta, black, white
+\definecolor{mygreen}{RGB}{28,172,0} % color values Red, Green, Blue
+\definecolor{mylilas}{RGB}{170,55,241}
+
+\lstset{language=Matlab,%
+    %basicstyle=\color{red},
+    breaklines=true,%
+    morekeywords={matlab2tikz},
+    keywordstyle=\color{blue},%
+    morekeywords=[2]{1}, keywordstyle=[2]{\color{black}},
+    identifierstyle=\color{black},%
+    stringstyle=\color{mylilas},
+    commentstyle=\color{mygreen},%
+    showstringspaces=false,%without this there will be a symbol in the places where there is a space
+    numbers=left,%
+    numberstyle={\tiny \color{black}},% size of the numbers
+    numbersep=9pt, % this defines how far the numbers are from the text
+    emph=[1]{for,end,break},emphstyle=[1]\color{red}, %some words to emphasise
+    %emph=[2]{word1,word2}, emphstyle=[2]{style},    
+}
+
 \author{ Bernhard Fürst \\ k0442418 \and Sebastian Ortner \\ kxxxxxxxxx}
 \title{Report Übung 01}
 \date{\today}
@@ -8,6 +34,11 @@
     \maketitle
     \section*{1}
     \subsection*{a}
+    
+    \hspace{-6cm}
+    \scalebox{0.55}{
+    \includegraphics{x1_6.png}
+    }
     \subsection*{b}
     \begin{itemize}
         \item $x_3 \rightarrow f_0 = \frac{\frac{2\pi}{64}}{1} \Rightarrow  \Omega_0 = \frac{2\pi}{64}$
