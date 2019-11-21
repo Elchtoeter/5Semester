@@ -23,7 +23,7 @@ import at.jku.cp.ai.rau.objects.Move;
 import at.jku.cp.ai.rau.objects.V;
 import at.jku.cp.ai.search.Node;
 import at.jku.cp.ai.search.Search;
-import at.jku.cp.ai.search.algorithms.UCS;
+import at.jku.cp.ai.search.algorithms.UCS1;
 import at.jku.cp.ai.utils.Constants;
 import at.jku.cp.ai.utils.PathUtils;
 import at.jku.cp.ai.utils.TestUtils;
@@ -53,7 +53,7 @@ public class TestCostSearchers {
 		testSearcherForLevel(
 				Board.fromLevelFile(pathToLevel + "/level"),
 				IBoardNode.class,
-				UCS.class,
+				UCS1.class,
 				LevelCost.fromFile(pathToLevel + "/costs"),
 				PathUtils.fromFile(pathToLevel + "/ucs.path"));
 	}

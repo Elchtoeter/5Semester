@@ -4,6 +4,9 @@ import ssw.mj.Errors;
 import ssw.mj.Parser;
 import ssw.mj.Scanner;
 import ssw.mj.Token.Kind;
+import ssw.mj.symtab.Obj;
+import ssw.mj.symtab.Struct;
+import ssw.mj.symtab.Tab;
 
 import java.util.EnumSet;
 
@@ -12,8 +15,8 @@ import static ssw.mj.Token.Kind.*;
 
 public final class ParserImpl extends Parser {
 
-    private static final EnumSet<Kind> firstTSStatement = EnumSet.of
-            (ident, if_, while_, break_, compare_, return_, read, print, lbrace, semicolon);
+    //private static final EnumSet<Kind> firstTSStatement = EnumSet.of
+    //        (ident, if_, while_, break_, compare_, return_, read, print, lbrace, semicolon);
     private static final EnumSet<Kind> firstTSAssignOp = EnumSet.of
             (assign, plusas, minusas, timesas, slashas, remas);
     private static final EnumSet<Kind> firstTSExpr = EnumSet.of
@@ -21,8 +24,8 @@ public final class ParserImpl extends Parser {
     private static final EnumSet<Kind> firstTSRelOp = EnumSet.of
             (eql, neq, gtr, geq, lss, leq);
 
-    private static final EnumSet<Kind> catchDecl = EnumSet.of(eof,final_,class_,lbrace,semicolon);
-    private static final EnumSet<Kind> catchStat = EnumSet.of(eof,if_,while_,break_,compare_,read,print,semicolon);
+    private static final EnumSet<Kind> catchDecl = EnumSet.of(eof, final_, class_, lbrace, semicolon);
+    private static final EnumSet<Kind> catchStat = EnumSet.of(eof, if_, while_, break_, compare_, read, print, semicolon);
 
 
     private static final int MIN_ERROR_DIST = 3;
@@ -39,6 +42,16 @@ public final class ParserImpl extends Parser {
         scan();
         Program();
         check(eof);
+    }
+
+
+    // Errors are no longer handled in panic mode so we override :
+    @Override
+    public void error(Errors.Message msg, Object... msgParams) {
+        if (errorDist >= MIN_ERROR_DIST) {
+            scanner.errors.error(la.line, la.col, msg, msgParams);
+        }
+        errorDist = 0;
     }
 
     private void check(Kind expected) {
@@ -59,18 +72,28 @@ public final class ParserImpl extends Parser {
     private void Program() {
         check(program);
         check(ident);
-		while (true) {
-			if (sym == class_) {
-				ClassDecl();
-			} else if (sym == ident) {
-				VarDecl();
-			} else if (sym == final_) {
-				ConstDecl();
-			} else {
-				break;
-			}
-		}
-		check(lbrace);
+        Obj program = tab.insert(Obj.Kind.Prog, t.str, Tab.noType);
+
+        tab.openScope();
+
+        while (sym != lbrace && sym != eof) {
+            if (sym == class_) {
+                ClassDecl();
+            } else if (sym == ident) {
+                VarDecl();
+            } else if (sym == final_) {
+                ConstDecl();
+            } else {
+                error(INVALID_DECL);
+                recoverDecl();
+            }
+        }
+
+        if (tab.curScope.nVars() > MAX_GLOBALS) {
+            error(TOO_MANY_GLOBALS);
+        }
+
+        check(lbrace);
         while (true) {
             if (sym == void_ || sym == ident) {
                 MethodDecl();
@@ -81,18 +104,29 @@ public final class ParserImpl extends Parser {
         check(rbrace);
     }
 
+    private void recoverDecl() {
+        while (!catchDecl.contains(sym)) {
+            scan();
+        }
+        errorDist = 0;
+    }
+
     private void ClassDecl() {
         scan();
         check(ident);
+        Obj clas = tab.insert(Obj.Kind.Type, t.str, new StructImpl(Struct.Kind.Class));
+        tab.openScope();
         check(lbrace);
-        while (true) {
-            if (sym == ident) {
-                VarDecl();
-            } else {
-                break;
-            }
+        while (sym == ident) {
+            VarDecl();
         }
+
+        if (tab.curScope.nVars() > MAX_FIELDS) {
+            error(TOO_MANY_FIELDS);
+        }
+        clas.type.fields = tab.curScope.locals();
         check(rbrace);
+        tab.closeScope();
     }
 
     private void VarDecl() {
@@ -100,7 +134,7 @@ public final class ParserImpl extends Parser {
         check(ident);
         while (true) {
             if (sym == comma) {
-            	scan();
+                scan();
                 check(ident);
             } else break;
         }
@@ -166,98 +200,98 @@ public final class ParserImpl extends Parser {
     }
 
     private void Statement() {
-		switch (sym) {
-			case ident:
-				Designator();
-				if (firstTSAssignOp.contains(sym)) {
-					Assignop();
-					Expr();
-				} else if (sym == lpar) {
-					ActPars();
-				} else if (sym == pplus) {
-					scan();
-				} else if (sym == mminus) {
-					scan();
-				} else {
-					error(DESIGN_FOLLOW);
-				}
-				check(semicolon);
-				break;
-			case if_:
-				scan();
-				check(lpar);
-				Condition();
-				check(rpar);
-				Statement();
-				if (sym == else_) {
-					scan();
-					Statement();
-				}
-				break;
-			case while_:
-				scan();
-				check(lpar);
-				Condition();
-				check(rpar);
-				Statement();
-				break;
-			case break_:
-				scan();
-				check(semicolon);
-				break;
-			case compare_:
-				scan();
-				check(lpar);
-				Expr();
-				check(comma);
-				Expr();
-				check(rpar);
-				Block();
-				Block();
-				Block();
-				break;
-			case return_:
-				scan();
-				if (firstTSExpr.contains(sym))
-					Expr();
-				check(semicolon);
-				break;
-			case read:
-				scan();
-				check(lpar);
-				Designator();
-				check(rpar);
-				check(semicolon);
-				break;
-			case print:
-				scan();
-				check(lpar);
-				Expr();
-				if (sym == comma) {
-					scan();
-					check(number);
-				}
-				check(rpar);
-				check(semicolon);
-				break;
-			case lbrace:
-				Block();
-				break;
-			case semicolon:
-				scan();
-				break;
-			default:
-				recoverStat();
-				break;
-		}
+        switch (sym) {
+            case ident:
+                Designator();
+                if (firstTSAssignOp.contains(sym)) {
+                    Assignop();
+                    Expr();
+                } else if (sym == lpar) {
+                    ActPars();
+                } else if (sym == pplus) {
+                    scan();
+                } else if (sym == mminus) {
+                    scan();
+                } else {
+                    error(DESIGN_FOLLOW);
+                }
+                check(semicolon);
+                break;
+            case if_:
+                scan();
+                check(lpar);
+                Condition();
+                check(rpar);
+                Statement();
+                if (sym == else_) {
+                    scan();
+                    Statement();
+                }
+                break;
+            case while_:
+                scan();
+                check(lpar);
+                Condition();
+                check(rpar);
+                Statement();
+                break;
+            case break_:
+                scan();
+                check(semicolon);
+                break;
+            case compare_:
+                scan();
+                check(lpar);
+                Expr();
+                check(comma);
+                Expr();
+                check(rpar);
+                Block();
+                Block();
+                Block();
+                break;
+            case return_:
+                scan();
+                if (firstTSExpr.contains(sym))
+                    Expr();
+                check(semicolon);
+                break;
+            case read:
+                scan();
+                check(lpar);
+                Designator();
+                check(rpar);
+                check(semicolon);
+                break;
+            case print:
+                scan();
+                check(lpar);
+                Expr();
+                if (sym == comma) {
+                    scan();
+                    check(number);
+                }
+                check(rpar);
+                check(semicolon);
+                break;
+            case lbrace:
+                Block();
+                break;
+            case semicolon:
+                scan();
+                break;
+            default:
+                recoverStat();
+                break;
+        }
     }
 
     private void recoverStat() {
         error(INVALID_STAT);
         do {
             scan();
-        }while (catchStat.contains(sym));
-        errorDist =0;
+        } while (catchStat.contains(sym));
+        errorDist = 0;
     }
 
     private void Assignop() {
@@ -357,33 +391,33 @@ public final class ParserImpl extends Parser {
         }
     }
 
-	private void Designator() {
-		check(ident);
-		while (sym == period || sym == lbrack) {
-			if (sym == period) {
-				scan();
-				check(ident);
-			} else {
-				scan();
-				Expr();
-				check(rbrack);
-			}
-		}
-	}
+    private void Designator() {
+        check(ident);
+        while (sym == period || sym == lbrack) {
+            if (sym == period) {
+                scan();
+                check(ident);
+            } else {
+                scan();
+                Expr();
+                check(rbrack);
+            }
+        }
+    }
 
-	private void Addop() {
-		if (sym == plus || sym == minus) {
-			scan();
-		} else {
-			error(ADD_OP);
-		}
-	}
+    private void Addop() {
+        if (sym == plus || sym == minus) {
+            scan();
+        } else {
+            error(ADD_OP);
+        }
+    }
 
-	private void Mulop() {
-		if (sym == times || sym == slash || sym == rem) {
-			scan();
-		} else {
-			error(MUL_OP);
-		}
-	}
+    private void Mulop() {
+        if (sym == times || sym == slash || sym == rem) {
+            scan();
+        } else {
+            error(MUL_OP);
+        }
+    }
 }
