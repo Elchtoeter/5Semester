@@ -12,6 +12,7 @@ import java.util.EnumSet;
 
 import static ssw.mj.Errors.Message.*;
 import static ssw.mj.Token.Kind.*;
+import static ssw.mj.symtab.Tab.noType;
 
 public final class ParserImpl extends Parser {
 
@@ -72,7 +73,7 @@ public final class ParserImpl extends Parser {
     private void Program() {
         check(program);
         check(ident);
-        Obj program = tab.insert(Obj.Kind.Prog, t.str, Tab.noType);
+        Obj program = tab.insert(Obj.Kind.Prog, t.str, noType);
 
         tab.openScope();
 
@@ -84,7 +85,6 @@ public final class ParserImpl extends Parser {
             } else if (sym == final_) {
                 ConstDecl();
             } else {
-                error(INVALID_DECL);
                 recoverDecl();
             }
         }
@@ -95,19 +95,22 @@ public final class ParserImpl extends Parser {
 
         check(lbrace);
         while (true) {
-            if (sym == void_ || sym == ident) {
+            if (sym != eof && sym != rbrace) {
                 MethodDecl();
             } else {
                 break;
             }
         }
         check(rbrace);
+        program.locals = tab.curScope.locals();
+        tab.closeScope();
     }
 
     private void recoverDecl() {
-        while (!catchDecl.contains(sym)) {
+        error(INVALID_DECL);
+        do {
             scan();
-        }
+        } while (!catchDecl.contains(sym));
         errorDist = 0;
     }
 
@@ -130,12 +133,14 @@ public final class ParserImpl extends Parser {
     }
 
     private void VarDecl() {
-        Type();
+        StructImpl type = Type();
         check(ident);
+        tab.insert(Obj.Kind.Var, t.str, type);
         while (true) {
             if (sym == comma) {
                 scan();
                 check(ident);
+                tab.insert(Obj.Kind.Var, t.str, type);
             } else break;
         }
         check(semicolon);
@@ -143,59 +148,101 @@ public final class ParserImpl extends Parser {
 
     private void ConstDecl() {
         scan();
-        Type();
+        StructImpl type = Type();
         check(ident);
+        Obj constObj = tab.insert(Obj.Kind.Con, t.str, type);
         check(assign);
-        if (sym == number || sym == charConst) {
+        if (sym == number) {
+            if (type.kind != Struct.Kind.Int) error(CONST_TYPE);
             scan();
+            constObj.val = t.val;
+        } else if (sym == charConst) {
+            if (type.kind != Struct.Kind.Char) error(CONST_TYPE);
+            scan();
+            constObj.val = t.val;
         } else {
             error(CONST_DECL);
         }
         check(semicolon);
     }
 
-    private void Type() {
+    private StructImpl Type() {
         check(ident);
+        Obj slo = tab.find(t.str);
+        if (slo.kind != Obj.Kind.Type) {
+            error(NO_TYPE);
+        }
+        StructImpl type = slo.type;
         if (sym == lbrack) {
             scan();
             check(rbrack);
+            return new StructImpl(type);
         }
+        return type;
     }
 
     private void MethodDecl() {
+        StructImpl type = noType;
         if (sym == void_) {
             scan();
         } else if (sym == ident) {
-            Type();
+            type = Type();
         } else {
             error(METH_DECL);
+            recoverMeth();
         }
         check(ident);
+        Obj method = tab.insert(Obj.Kind.Meth, t.str, type);
+        method.adr = code.pc;
         check(lpar);
+        tab.openScope();
         if (sym == ident) {
             FormPars();
         }
         check(rpar);
+        method.nPars = tab.curScope.nVars();
+        if ("main".equals(method.name)) {
+            if (method.nPars != 0) {
+                error(MAIN_WITH_PARAMS);
+            }
+            if (method.type != Tab.noType) {
+                error(MAIN_NOT_VOID);
+            }
+        }
         while (sym == ident) {
             VarDecl();
         }
+        if (tab.curScope.nVars() > MAX_LOCALS) {
+            error(TOO_MANY_LOCALS);
+        }
         Block();
+        method.locals = tab.curScope.locals();
+        tab.closeScope();
+    }
+
+    private void recoverMeth() {
+        while (sym != eof && sym != void_ &&
+                sym != ident && tab.find(sym.label()).kind != Obj.Kind.Type) {
+            scan();
+        }
+        errorDist = 0;
     }
 
     private void FormPars() {
-        Type();
-        check(ident);
-        while (sym == comma) {
-            scan();
-            Type();
+        do {
+            final StructImpl type = Type();
             check(ident);
-        }
+            tab.insert(Obj.Kind.Var, t.str, type);
+            if (sym == comma) scan();
+            else break;
+        } while (true);
     }
 
     private void Block() {
         check(lbrace);
-        while (sym != rbrace && sym != eof)
+        while (sym != rbrace && sym != eof) {
             Statement();
+        }
         check(rbrace);
     }
 
