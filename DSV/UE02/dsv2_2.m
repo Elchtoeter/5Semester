@@ -16,7 +16,7 @@ xt = x1+x2+x3+x4;
   figure('name', 'UE2 2a');
   subplot(511); hold on; grid on;
   title('Gleichanteil');
-  plot(t, x1);
+  plot(t,x1);
   xlabel('t[ms]');
   ylabel('x(t)');
 
@@ -44,7 +44,7 @@ xt = x1+x2+x3+x4;
   xlabel('t[ms]');
   ylabel('x(t)');
 
-  print('Aufgabe2_2_a.png')
+  print('fig\Aufgabe2_2_a.png')
 
 
   % 2b) fourier koeffizienten, ak, bk
@@ -83,5 +83,5 @@ xt = x1+x2+x3+x4;
   plot(t, real(xfr));
   xlabel('t[ms]');
   ylabel('x(t)');
-  print('Aufgabe2_2_c.png')
+  print('fig\Aufgabe2_2_c.png')
   
