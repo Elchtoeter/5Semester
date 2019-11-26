@@ -335,9 +335,12 @@ public final class ParserImpl extends Parser {
 
     private void recoverStat() {
         error(INVALID_STAT);
-        do {
+        while (!catchStat.contains(sym)) {
             scan();
-        } while (catchStat.contains(sym));
+        }
+        if (sym == semicolon) {
+            scan();
+        }
         errorDist = 0;
     }
 

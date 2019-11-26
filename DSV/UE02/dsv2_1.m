@@ -25,6 +25,7 @@ clc
 	
 % Visualization
 	figure('name', 'Aufgabe_1b'); hold on; grid on;	
+  axis([-5 9 -4 8])
 	plot(c6,'ko');
 	plot(c7,'ro');
 	plot(c8,'bo');

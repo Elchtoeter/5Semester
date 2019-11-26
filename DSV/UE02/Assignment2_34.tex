@@ -1,5 +1,6 @@
 \documentclass[12pt,a4paper,austrian]{article}
 \usepackage{graphicx}
+\usepackage{graphics}
 \usepackage[austrian, english]{babel}
 \usepackage[utf8]{inputenc}
 \usepackage{listings}
@@ -128,7 +129,7 @@
       \item \begin{itemize}
            \item{$c_5$} \begin{align*}
             c_1 &= -3 + j5 \\
-            c_2 &= \sqrt{2} \exp^{-j\frac{3\pi}{4}} \\
+            c_2 &= \sqrt{2} e^{-j\frac{3\pi}{4}} \\
             c_2 &= |c2|\cos{\frac{-3\pi}{4}} + j|c2|\sin{\frac{-3\pi}{4}}\\
             c_2 &= \sqrt{2}*\frac{-1}{\sqrt{2}} + j*\sqrt{2}\frac{-1}{\sqrt{2}} \\
             c_2 &= -1 - j\\
@@ -144,9 +145,9 @@
             \end{align*}
         \item{$c_7$} \begin{align*}
             c_7 &= c_1 * c_2 \\
-            c_1 &= \sqrt{(-3^{2} + 5^{2})} \exp^{\arctan\frac{5}{3}*j} \\
+            c_1 &= \sqrt{(-3^{2} + 5^{2})} e^{\arctan\frac{5}{3}*j} \\
             c_1 &= \sqrt{34}e^{j121^\circ}*\sqrt{2}e^{-j135^\circ} \\
-            c_7 &= \sqrt{78}\exp^{-j14^\circ} \implies \sqrt{78}\exp^{j346^\circ} \\
+            c_7 &= \sqrt{78}e^{-j14^\circ} \implies \sqrt{78}e^{j346^\circ} \\
             \end{align*}
         \item{$c_8$}\begin{align*}
             c_8 &= |c_2| \implies \sqrt{2} \\
@@ -183,11 +184,10 @@
         \includegraphics{Aufgabe2_1_c.png}
         }
        \item \begin{align*}
-        \alpha_1 &= 45\circ = \frac{45*\pi}{180} = 25\circ = \frac{\pi}{4}= \\
-        \alpha_2 &= -90\circ = \frac{(360-90)*\pi}{180} = \frac{270*\pi}{180} = \frac{3\pi}{2} rad \\
-        \alpha_3 &= \frac{\pi}{4} = \frac{180\circ}{4} = 45 \circ\\ 
-        oder siehe ~\alpha_1\\
-        \alpha_4 &= \frac{7\pi}{3} = \frac{\frac{7\pi}{3}180}{\pi} = \frac{7 * 180}{3} = 440 \circ
+        \alpha_1 &= 45\circ = \frac{45*\pi}{180} = \frac{\pi}{4}= 0,7854 rad \\
+        \alpha_2 &= -90\circ = \frac{-90*\pi}{180} = \frac{-1\pi}{2} rad = -1,571 rad \\
+        \alpha_3 &= \frac{\pi}{4} = \frac{180^\circ\pi}{4} = 45^\circ\\
+        \alpha_4 &= \frac{7\pi}{3} = \frac{\frac{7\pi}{3}*180^\circ}{\pi} = \frac{7 * 180}{3} = 420^\circ
        \end{align*}
     \end{enumerate}
 \end{aufgabe}
@@ -199,8 +199,8 @@
   \item{}
 ~
 
-\hspace{-3.5cm}
-\scalebox{0.55}{
+\hspace{-1.5cm}
+\scalebox{0.9}{
 \includegraphics{Aufgabe2_2_a.png}
 }
 \item Die Koeffizienten $a_k$ und $b_k$ skalieren die Kosinus ($a_k$) bzw. die Sinusanteile der k-ten Harmonischen Schwingung einer durch eine Fourierreihe dargestellten Schwingung.
@@ -208,10 +208,10 @@
         Die Koeffizienten sind in der gegebenen Gleichung ablesbar. Die Gleichung hat die allgemeine Form:
 
         \begin{align*}
-            x(t) = \frac{a_0}{2} + a_{k_1}*\cos(2\pi k_1 f_0 t) + a_{k2}*\cos(2\pi k_2 f_0 t) +a_{k3}*\cos(2\pi k_3 f_0 t) ...
+            x(t) = \frac{a_0}{2} + a_{k_1}*\cos(2\pi k_1 f_0 t) + a_{k2}*\cos(2\pi k_2 f_0 t) +b_{k3}*\sin(2\pi k_3 f_0 t) ...
         \end{align*}
 
-        Wir können also anhand des ganzzahligen Faktors im Argument des Kosinus das $k$ auf das sich der jeweilige Faktor $a_k$ bezieht, feststellen, indem wir mit 2 dividieren da $2\pi$ ja erhalten bleiben muss.
+        Wir können also anhand des ganzzahligen Faktors im Argument des Kosinus das $k$ auf das sich der jeweilige Faktor $a_k$ bezieht, feststellen, indem wir mit 2 dividieren da $2\pi$ ja erhalten bleiben muss. Bei den Sinustermen erhält man entsprechend $b_k$. 
 
         Die so festgestelleten Faktoren lauten demnach :
 
@@ -232,6 +232,7 @@
         \end{align*}
 
         feststellen. Bei fehlendem $a_k$ zu einem vorhandenen $b_k$ muss der fehlende Faktor 0 sein damit der Term in der endlichen Darstellung der Fourierreihe wegfällt et vice versa.
+         Zudem muss es zu jedem festgestelltem Koeffizientenpaar $a_k / b_k$, Werte bei $-k$ sowie $k$ geben da die komplexe Fourierreihe ja von $-\infty$ nach $\infty$ läuft, während die Sinus/Kosinus Darstellung von $1$ nach $\infty$, plus den Sonderfall bei $0$, läuft.
 
         Die errechneten komplexen Fourierkoeffizienten lauten :
 
@@ -245,6 +246,12 @@
             c_{-10} &= i
         \end{align*}
 
+        Die komplexe Form der gegebenen Fourierreihe ist somit :
+
+        \begin{math}
+          x(t) = -3e^{0} - 1.5e^{2\pi i f_0 t} - 1.5e^{-2\pi i f_0 t} + i e^{4\pi i f_0 t} - i e^{-4\pi i f_0 t} - i e^{20\pi i f_0 t} + i e^{-20\pi i f_0 t}
+        \end{math}
+
         Visualisiert nach den Vorgaben der Angabe ergibt sich folgendes Bild :
 
         \hspace{-3cm}
@@ -254,5 +261,44 @@
 \item
         Die Frequenz hat keinen Einfluss auf $a_k$ und $b_k$ und somit auch keine Einfluss auf die entsprechenden $c_k / c_{-k}$.
 \end{enumerate}
+\end{aufgabe}
+\begin{aufgabe}{}
+  \begin{enumerate}
+    \item LTI ist ein Akronym aus dem Englischen und bezeichnet ein \textit{linear time-invariant} system also zu Deutsch ein lineares zeitinvariantes System.
+    
+
+          Linear ist ein System dann wenn eine Summe von beliebig vielen Einganssignalen zu einer proportionalen Antwort des Ausgangsignales führt. Die System muss also dem Überlagerungsprinzip folgen.
+
+          Zeitinvarianz bezeichnet eine Eigenschaft des Systems die besagt dass wenn ein Eingangssignal zeitverschoben erscheint, das Ausgangssignal sich nur um diese Zeitverschiebung unterscheidet. Das System reagiert also zu jedem Zeitpunkt mit der gleichen Antwort.
+  
+  
+    \end{enumerate}
+\end{aufgabe}
+\pagebreak
+\begin{aufgabe}
+    ~
+
+    \hspace{-1.5cm}
+    \scalebox{0.6}{
+    \includegraphics{Abtastung15khz.jpg}}
+
+    Bei einer Abtastung mit 15kHz sieht man deutlich die Überlagerungen der Spektren. Durch eine Aufsummierung der Signale im Überlagerunsbereich erhält man folgendes Spektrum :
+
+    \hspace{-1.5cm}
+    \scalebox{0.6}{
+    \includegraphics{Abtastung15khzResult.jpg}}
+
+
+    ~
+
+  Bei einer Abtastung mit 25kHz kommt es zu keinen Überlagerungen :
+
+    ~
+
+    \hspace{-1.5cm}
+    \scalebox{0.6}{
+    \includegraphics{Abtastung25khz.jpg}}
+
+    Um ein Analogsignal verlustfrei wieder rekonstruieren zu können muss man nach dem Nyquist-Shannon-Abtasttheorem mit einer Frequenz $f_s$ von $f_s >= 2*f_{max}$ abgetastet werden. Wie man an dem Beispiel mit $f_s = 15kHz$ sehen kann geht bei einer zu niedrigen Abtastfrequenz Information über das Spektrum des abgetasteten Signals verloren und es entsteht Aliasing. Um die höherfrequenten Resonanzen, die Wiederholungen des Signals, zu vermeiden werden die Signale auch bandbegrenzt.
 \end{aufgabe}
 \end{document}
