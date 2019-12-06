@@ -1,0 +1,36 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\title{Report Assignment 01}
+\author{Fürst, Bernhard\\ \texttt{00442418}
+        \and
+        Prohaska, Elias \\ \texttt{01306484}}
+\date{\today}
+\begin{document}
+    \maketitle
+    \section*{1}
+    Purpose of Datastructures
+    \subsection*{A}
+    \subsubsection*{1}
+    The included StablePriorityQueue stores the order in which entries with the same key values have been added.
+    This guarantuees the same result over multiple runs.
+    \subsubsection*{2}
+    StackWithfastContains is not only a Stack but also a Set which allows for a fast contains() function in $O(1)$. This eliminates the need for a separate Set for that purpose.
+    \subsection*{B}
+    We used the following data structures in our implementations
+    \begin{itemize}
+        \item{LinkedList} \\ BFS requires a first-in-first-out data structure. A linked provides us with fast access to the first element, i.e. the head of the linked list, and it allows us to easily and quickly add elements to the tail of the list without having to resize underlying arrays or other structures. The usual disadvantages of linked list, i.e. pointer chasing over nonconsecutive memory regions aren't of any consequence as we never iterate over the whole list.
+        \item{HashSet} \\ Wherever we keep track of already visited Nodes we use a HashSet to benefit from the fast contains() function. If we were to use a data structure we had to iterate over, we would incur significant performance penalties.
+        \item{Pair} \\ Wherever we store a Node together with its associated cost or heuristics we use the provided Pair class.
+        \item {StablePriorityQueue} \\ The aforementioned Pairs are stored in the provided class StablePriorityQueue. If we use the costs of a node as the key, polling the Queue will gives us the element with the lowest key, i.e. cost value. A Queue can contain multiple entries with the same value whereas a Set can't. A Queue would deliver an arbitrary element when polled whereas this class is explicitly stable by virtue of additionally storing information about the order elements have been added to it. This ensures consistent results.
+    \end{itemize}
+    \section*{3}
+    BFS and IDS will always go the same path since both find the optimal solution if all action costs are the same. 
+    \section*{4}
+    \subsection*{C}
+    The best heuristic would be an all-knowing one, that is not based on probability methods. But since that would defeat the purpose of searching in the first place, a GBFS cannot be expected to always yield the best result.
+    The best heuristic for A* would be one, that always estimates the actual costs.
+    \subsection*{D}
+    It depends on what we want. A* always provides the optimal solution, but may take longer to compute. 
+On the other hand GBFS is better if we consider time or memory limitations, since it will find a result earlier than A*, or in the worst case (only one solution) exactly as fast.
+\end{document}

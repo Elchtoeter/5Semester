@@ -1,0 +1,188 @@
+\documentclass[12pt,a4paper,austrian]{article}
+\usepackage{graphicx}
+\usepackage[austrian, english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{listings}
+\usepackage{multirow}
+\usepackage{epstopdf}
+\usepackage{amsmath}
+\usepackage{amssymb} % fuer Mengen \N, Q, C, R
+\graphicspath{{./fig/}}
+
+
+%% Satzspiegel
+\setlength{\hoffset}{-1in} \setlength{\textwidth}{18cm}
+\setlength{\oddsidemargin}{1.5cm}
+\setlength{\evensidemargin}{1.5cm}
+\setlength{\marginparsep}{0.7em}
+\setlength{\marginparwidth}{0.5cm}
+
+\setlength{\voffset}{-1.9in}
+\setlength{\headheight}{12pt}
+\setlength{\topmargin}{2.6cm}
+   \addtolength{\topmargin}{-\headheight}
+\setlength{\headsep}{3.5cm}
+   \addtolength{\headsep}{-\topmargin}
+   \addtolength{\headsep}{-\headheight}
+\setlength{\textheight}{27cm}
+
+%% How should floats be treated?
+\setlength{\floatsep}{12 pt plus 0 pt minus 8 pt}
+\setlength{\textfloatsep}{12 pt plus 0pt minus 8 pt}
+\setlength{\intextsep}{12 pt plus 0pt minus 8 pt}
+
+\tolerance2000
+\emergencystretch20pt
+
+%% Text appearence
+% English text
+\newcommand{\eg}[1]%
+  {\selectlanguage{english}\textit{#1}\selectlanguage{austrian}}
+
+\newcommand{\filename}[1]
+  {\begin{small}\texttt{#1}\end{small}}
+
+\newcommand\IFT{\unitlength1mm\begin{picture}(10,2) \put (1,1)
+{\circle{1.7}} \put(2,1){\line(1,0){5}} \put(8,1)
+{\circle*{1.7}}\end{picture}}
+\newcommand\FT{\unitlength1mm\begin{picture}(10,2) \put (1,1)
+{\circle*{1.7}} \put(2,1){\line(1,0){5}} \put(8,1)
+{\circle{1.7}}\end{picture}}
+
+% A box for multiple choice problems
+\newcommand{\choicebox}{\fbox{\rule{0pt}{0.5ex}\rule{0.5ex}{0pt}}}
+
+\newenvironment{wahrfalsch}%
+  {\bigskip\par\noindent\makebox[1cm][c]{richtig}\hspace{3mm}\makebox[1cm][c]{falsch}
+   \begin{list}%
+   {\makebox[1cm][c]{\choicebox}\hspace{3mm}\makebox[1cm][c]{\choicebox}}%
+   {\setlength{\labelwidth}{2.31 cm}\setlength{\labelsep}{3mm}
+    \setlength{\leftmargin}{2.61 cm}\setlength{\listparindent}{0pt}
+    \setlength{\itemindent}{0pt}}%
+  }
+  {\end{list}}
+
+\newcounter{theaufgabe}\setcounter{theaufgabe}{1}
+\newenvironment{aufgabe}[1]%
+  {\bigskip\par\noindent\begin{nopagebreak}
+   \textsf{\textbf{\arabic{theaufgabe}.\thinspace Aufgabe}}\quad
+      \textsf{\textit{#1}}\\*[1ex]%
+\stepcounter{theaufgabe}\hspace{2ex}\end{nopagebreak}}
+  {\par\pagebreak[2]}
+
+% Innerhalb der Aufgaben erfolgt die weitere Unterteilung mittels einer
+% enumerate Umgebung, die allerdings a), b),... zaehlen soll.
+\renewcommand{\labelenumi}{\alph{enumi})}
+\renewcommand{\labelenumii}{\arabic{enumii})}
+
+% A box to tick for everything which has to done
+\newcommand{\abgabe}{\marginpar{$\Box$}}
+% Margin paragraphs on the left side
+\reversemarginpar
+
+% Language for listings
+\lstset{language=Vhdl,
+  basicstyle=\small\tt,
+  keywordstyle=\tt\bf,
+  commentstyle=\sl}
+
+% No indention
+\setlength{\parindent}{0.0cm}
+% Don't number sections
+\setcounter{secnumdepth}{0}
+
+
+%% Beginning of the text
+
+\begin{document}
+\selectlanguage{austrian}
+\pagestyle{plain}
+% This is the header section
+  \thispagestyle{empty}
+  \noindent
+  %\includegraphics[height=2.5cm]{fig/JKULogoFullEnglShort}
+  % blagOPP
+  \begin{minipage}[b][2.4cm]{1.0\textwidth}  
+  \begin{tabular}{l p{11cm} r} 
+    \multicolumn{3}{c}{\centering \begin{large}\begin{bf}
+  	\textsf{Digitale Signalverarbeitung, WS 2019/20} \end{bf}\end{large} }  
+  	 \\
+  	\multirow{2}{*}{\includegraphics[height=1.6cm]{fig/JKU_Logo}} 
+  	& \centering Bernhard Fürst k0442418, Sebastian Ortner kxxxxxx, Gruppe 34 \vspace{1.3em}  &
+    \multirow{2}{*}{\includegraphics[height=1.9cm]{fig/ISP-Logo-color-02}}  \\	
+    & \centering \textit{1. Übung} & \\     
+    \multicolumn{3}{c}{\centering \begin{large}
+    \textit{Überschrift der Übung}%
+    \end{large} }  
+ 
+  \end{tabular} 
+  \end{minipage}
+%  \vspace{-1.2em}
+
+  \noindent \rule[0.8em]{\textwidth}{0.12mm}\\[-0.5em]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+\begin{aufgabe}{}
+Eventuell eine allgemeine Erklärung zu dieser Aufgabe (falls notwendig)
+\begin{enumerate}
+\item [a)] 
+Anmerkung: Dies sei eine analytische Aufgabe. \\ \\
+Hier soll gezeigt werden, dass das zeitdiskrete System 
+\[
+y[n] = x[n] + u[n-3] x[n-1].
+\]
+linear ist. Dazu wurden folgende Berechnungen durchgeführt:\\
+%
+\begin{align*}
+y_a[n] &= f\left(\underbrace{\alpha x_1[n] + \beta x_2[n]}_{\text{wird in Gleichung für x eingesetzt}}\right)\\ \\
+       &= \alpha\,x_1[n] + \beta\,x_2[n] + u[n-3] (\alpha\,x_1[n-1] + \beta\,x_2[n-1])\\ \\
+       &= \alpha\,x_1[n] + \beta\,x_2[n] + u[n-3] \alpha\,x_1[n-1] + u[n-3]  \beta\,x_2[n-1] \\ \\ 
+y_b[n] &= \alpha\,f(x_1[n]) + \beta f(x_2[n])\\ \\
+       &= \alpha (x_1[n] + u[n-3] x_1[n-1]) + \beta (x_2[n] + u[n-3] x_2[n-1])     \\ \\
+       &= \alpha x_1[n] + \alpha u[n-3] x_1[n-1] + \beta x_2[n] + \beta u[n-3] x_2[n-1] \\ \\
+       y_a[n] &= y_b[n] \rightarrow \text{linear} 
+\end{align*}
+%
+\item [b)]
+Anmerkung: In dieser Aufgabe sei eine Funktion zu implementieren. \\ \\
+Die Lösung dieses Beispiels finden Sie in \texttt{xxx.m}. Hier können auch eventuelle Probleme geschildert werden (falls etwas nicht ganz funktioniert). Gerne können hier auch Ergebnisse präsentiert werden, welche zeigen, dass die Implementierung korrekt ist (z.B. Diagramme, ...).
+
+\item [c)] 
+Anmerkung: In dieser Aufgabe seien diverse Plots zu veranschaulichen. \\ \\ 
+Figure~\ref{fig:Testpicture} zeigt ... \\
+Diskutieren Sie hier unbedingt, was das Bild zeigt bzw. ob es den Erwartungen entspricht oder nicht. Achten Sie auf eine sinnvolle Darstellung! Wenn in einem Plot nichts erkennbar ist, können auch keine Punkte vergeben werden. Vergessen Sie außerdem nie auf eine korrekte Achsenbeschriftung! 
+\begin{figure}[!ht]
+	\centering
+	\includegraphics[width=18cm]{Testpicture.eps}
+	\vspace{-0.3cm}
+	\caption{Das ist ein Testbild im eps Format.}
+	\label{fig:Testpicture}
+	\vspace{-0.1cm}
+\end{figure}
+
+\end{enumerate}
+\end{aufgabe}
+
+\begin{aufgabe}{}
+Erklärung der Aufgabe
+\begin{enumerate}
+\item [a)] 
+Teilaufgabe a)
+
+\item [b)]
+Teilaufgabe b)
+
+
+\item [c)] 
+Teilaufgabe c)
+
+\end{enumerate}
+\end{aufgabe}
+
+
+
+\end{document}
