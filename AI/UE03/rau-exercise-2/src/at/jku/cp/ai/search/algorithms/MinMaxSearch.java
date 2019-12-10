@@ -17,12 +17,12 @@ public class MinMaxSearch implements AdversarialSearch {
 	 * To limit the extent of the search, this implementation should honor a
 	 * limiting predicate. The predicate returns 'true' as long as we are below the limit,
 	 * and 'false', if we exceed the limit.
-	 * 
+	 *
 	 * @param searchLimitingPredicate
 	 */
-	public MinMaxSearch(BiPredicate<Integer, Node> slp)
+	public MinMaxSearch(BiPredicate<Integer, Node> searchLimitingPredicate)
 	{
-		this.searchLimitingPredicate = slp;
+		this.searchLimitingPredicate = searchLimitingPredicate;
 	}
 
 	public Pair<Node, Double> search(Node start, Function<Node, Double> evalFunction) {
@@ -30,34 +30,36 @@ public class MinMaxSearch implements AdversarialSearch {
 
 		Node result = start;
 		double best = Double.NEGATIVE_INFINITY;
-		for (final Node n : start.adjacent()) {
+		for (Node n : start.adjacent()) {
 			final double val = min(n, 1);
 			if (val > best) {
 				best = val;
 				result = n;
 			}
 		}
-		return new Pair<Node, Double>(result, best);
+		return new Pair<>(result, best);
 	}
 
 	private double min(Node current, int depth) {
-		if (!searchLimitingPredicate.test(depth, current) || current.isLeaf())
+		if (current.isLeaf() || !searchLimitingPredicate.test(depth, current)) {
 			return evalFunction.apply(current);
+		}
 
-		double val = Double.NEGATIVE_INFINITY;
-		for (final Node n : current.adjacent()) {
-			val = Math.max(val, max(n, depth + 1));
+		double val = Double.POSITIVE_INFINITY;
+		for (Node n : current.adjacent()) {
+			val = Math.min(val, max(n, depth+1));
 		}
 		return val;
 	}
 
 	private double max(Node current, int depth) {
-		if (!searchLimitingPredicate.test(depth, current) || current.isLeaf())
+		if (current.isLeaf() || !searchLimitingPredicate.test(depth, current)) {
 			return evalFunction.apply(current);
+		}
 
-		double val = Double.POSITIVE_INFINITY;
-		for (final Node n : current.adjacent()) {
-			val = Math.min(val, min(n, depth + 1));
+		double val = Double.NEGATIVE_INFINITY;
+		for (Node n : current.adjacent()) {
+			val = Math.max(val, min(n, depth+1));
 		}
 		return val;
 	}

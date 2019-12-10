@@ -57,8 +57,15 @@ public class QLearner
 	
 		for (int episode = 0; episode < numEpisodes; episode++)
 		{
-			// TODO: put your implementation here	
-			
+			final IBoard episodeBoard = board.copy();
+			while (!(episodeBoard.getEndCondition().getWinner() == 0) && unicornLives(episodeBoard)) {
+				final List<Move> moves = episodeBoard.getPossibleMoves();
+				final Move move = moves.get(random.nextInt(moves.size()));
+				final IBoard prevBoard = episodeBoard.copy();
+				episodeBoard.executeMove(move);
+
+				updateQEntry(prevBoard, episodeBoard, move);
+			}
 		}
 	}
 
@@ -114,5 +121,14 @@ public class QLearner
 		}
 
 		return getReward(board);
+	}
+
+	private void updateQEntry(IBoard prevBoard, IBoard episodeBoard, Move move) {
+		if (unicornLives(episodeBoard))
+			qmatrix.put(new Pair<>(prevBoard, move), getReward(episodeBoard) + discountFactor * getMaxQValue(episodeBoard));
+	}
+
+	private boolean unicornLives(IBoard board) {
+		return board.getUnicorns().size() == 1;
 	}
 }

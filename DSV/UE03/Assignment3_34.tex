@@ -1,0 +1,162 @@
+\documentclass[12pt,a4paper,austrian]{article}
+\usepackage{graphicx}
+\usepackage[austrian, english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{listings}
+\usepackage{multirow}
+\usepackage{epstopdf}
+\usepackage{amsmath}
+\usepackage{amssymb} % fuer Mengen \N, Q, C, R
+\graphicspath{{./fig/}}
+
+
+%% Satzspiegel
+\setlength{\hoffset}{-1in} \setlength{\textwidth}{18cm}
+\setlength{\oddsidemargin}{1.5cm}
+\setlength{\evensidemargin}{1.5cm}
+\setlength{\marginparsep}{0.7em}
+\setlength{\marginparwidth}{0.5cm}
+
+\setlength{\voffset}{-1.9in}
+\setlength{\headheight}{12pt}
+\setlength{\topmargin}{2.6cm}
+   \addtolength{\topmargin}{-\headheight}
+\setlength{\headsep}{3.5cm}
+   \addtolength{\headsep}{-\topmargin}
+   \addtolength{\headsep}{-\headheight}
+\setlength{\textheight}{27cm}
+
+%% How should floats be treated?
+\setlength{\floatsep}{12 pt plus 0 pt minus 8 pt}
+\setlength{\textfloatsep}{12 pt plus 0pt minus 8 pt}
+\setlength{\intextsep}{12 pt plus 0pt minus 8 pt}
+
+\tolerance2000
+\emergencystretch20pt
+
+%% Text appearence
+% English text
+\newcommand{\eg}[1]%
+  {\selectlanguage{english}\textit{#1}\selectlanguage{austrian}}
+
+\newcommand{\filename}[1]
+  {\begin{small}\texttt{#1}\end{small}}
+
+\newcommand\IFT{\unitlength1mm\begin{picture}(10,2) \put (1,1)
+{\circle{1.7}} \put(2,1){\line(1,0){5}} \put(8,1)
+{\circle*{1.7}}\end{picture}}
+\newcommand\FT{\unitlength1mm\begin{picture}(10,2) \put (1,1)
+{\circle*{1.7}} \put(2,1){\line(1,0){5}} \put(8,1)
+{\circle{1.7}}\end{picture}}
+
+% A box for multiple choice problems
+\newcommand{\choicebox}{\fbox{\rule{0pt}{0.5ex}\rule{0.5ex}{0pt}}}
+
+\newenvironment{wahrfalsch}%
+  {\bigskip\par\noindent\makebox[1cm][c]{richtig}\hspace{3mm}\makebox[1cm][c]{falsch}
+   \begin{list}%
+   {\makebox[1cm][c]{\choicebox}\hspace{3mm}\makebox[1cm][c]{\choicebox}}%
+   {\setlength{\labelwidth}{2.31 cm}\setlength{\labelsep}{3mm}
+    \setlength{\leftmargin}{2.61 cm}\setlength{\listparindent}{0pt}
+    \setlength{\itemindent}{0pt}}%
+  }
+  {\end{list}}
+
+\newcounter{theaufgabe}\setcounter{theaufgabe}{1}
+\newenvironment{aufgabe}[1]%
+  {\bigskip\par\noindent\begin{nopagebreak}
+   \textsf{\textbf{\arabic{theaufgabe}.\thinspace Aufgabe}}\quad
+      \textsf{\textit{#1}}\\*[1ex]%
+\stepcounter{theaufgabe}\hspace{2ex}\end{nopagebreak}}
+  {\par\pagebreak[2]}
+
+% Innerhalb der Aufgaben erfolgt die weitere Unterteilung mittels einer
+% enumerate Umgebung, die allerdings a), b),... zaehlen soll.
+\renewcommand{\labelenumi}{\alph{enumi})}
+\renewcommand{\labelenumii}{\arabic{enumii})}
+
+% A box to tick for everything which has to done
+\newcommand{\abgabe}{\marginpar{$\Box$}}
+% Margin paragraphs on the left side
+\reversemarginpar
+
+% Language for listings
+\lstset{language=Vhdl,
+  basicstyle=\small\tt,
+  keywordstyle=\tt\bf,
+  commentstyle=\sl}
+
+% No indention
+\setlength{\parindent}{0.0cm}
+% Don't number sections
+\setcounter{secnumdepth}{0}
+
+
+%% Beginning of the text
+
+\begin{document}
+\selectlanguage{austrian}
+\pagestyle{plain}
+% This is the header section
+  \thispagestyle{empty}
+  \noindent
+  %\includegraphics[height=2.5cm]{fig/JKULogoFullEnglShort}
+  % blagOPP
+  \begin{minipage}[b][2.4cm]{1.0\textwidth}  
+  \begin{tabular}{l p{11cm} r} 
+    \multicolumn{3}{c}{\centering \begin{large}\begin{bf}
+  	\textsf{Digitale Signalverarbeitung, WS 2019/20} \end{bf}\end{large} }  
+  	 \\
+  	\multirow{2}{*}{\includegraphics[height=1.6cm]{fig/JKU_Logo}} 
+  	& \centering Bernhard Fürst k0442418, Sebastian Ortner k01607533, Gruppe 34 \vspace{1.3em}  &
+    \multirow{2}{*}{\includegraphics[height=1.9cm]{fig/ISP-Logo-color-02}}  \\	
+    & \centering \textit{3. Übung} & \\     
+    \multicolumn{3}{c}{\centering \begin{large}
+    \textit{Abtastung, DTFT und Frequenzanalyse}%
+    \end{large} }  
+ 
+  \end{tabular} 
+  \end{minipage}
+%  \vspace{-1.2em}
+
+  \noindent \rule[0.8em]{\textwidth}{0.12mm}\\[-0.5em]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+\begin{aufgabe}{}
+  \begin{enumerate}
+    \item Welches Verhalten beobachten Sie?
+
+          Der Minutenzeiger scheint rückläufig zu sein.
+    \item Mit welcher Frequenz wird die Uhrzeit abgetastet?
+    
+          Durch das \textit{pause} Kommando wird die Zeit zwischen jeder Iteration des Skripts auf 100 ms festgelegt. 
+          Betrachten wir die Abtastung als das Neuzeichnen des Plots so entsprechen diese 100 ms der Abtastfrequenz. 
+          Die Frequenz des "`Minutenzeigers" beträgt in diesem Fall $100*\frac{12}{11}$ ms.  
+          Das Verhältnis $\frac{f_s}{f_{min}}$ entspricht in jedem Fall immer $\frac{11}{12}$.
+
+    \item Was ist die Ursache für dieses Verhalten?
+    
+    Die Ursache für dieses Verhalten ist ein zeitlicher Aliasingeffekt auch Stroboskopeffekt genannt. Liegt die Signalfrequenz zwischen der Nyquist-Frequenz und der Abtastfrequenz, so scheint der Zeiger rückwärts zu laufen
+  \end{enumerate}
+\end{aufgabe}
+
+\begin{aufgabe}{}
+  \begin{enumerate}
+    \item Was fällt Ihnen in Bezug auf die Periodizität auf ?
+    
+    Bei allen Vielfachen $n * 2\pi | n\in \mathbb{Z}$ wiederholt sich das Signal.
+
+    \item Was fällt Ihnen beim Phasenverlauf auf?
+    
+    Bleibt konstant bei 0 
+
+  \end{enumerate}
+  
+\end{aufgabe}
+
+
+\end{document}

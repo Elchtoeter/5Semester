@@ -1,0 +1,6 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="SEP-jvm">
+    <output-path>C:\Github\5Semester\SEP\build\libs</output-path>
+    <root id="archive" name="SEP-jvm.jar" />
+  </artifact>
+</component>
