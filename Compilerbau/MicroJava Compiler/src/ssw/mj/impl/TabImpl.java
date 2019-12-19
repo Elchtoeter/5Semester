@@ -96,7 +96,7 @@ public final class TabImpl extends Tab {
 
 		final Obj field = type.fields.get(name);
 		if (field == null) {
-			parser.error(NOT_FOUND, name);
+			parser.error(NO_FIELD, name);
 			return noObj;
 		}
 		return field;

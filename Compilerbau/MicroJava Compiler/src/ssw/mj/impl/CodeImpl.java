@@ -4,6 +4,7 @@ import ssw.mj.Errors;
 import ssw.mj.Parser;
 import ssw.mj.codegen.Code;
 import ssw.mj.codegen.Operand;
+import ssw.mj.symtab.Obj;
 import ssw.mj.symtab.Tab;
 
 import static ssw.mj.Errors.*;
@@ -104,21 +105,21 @@ public final class CodeImpl extends Code {
 		}
 	}
 
-	public void store(Operand x) {
-		switch (x.kind) {
+	public void store(Operand op) {
+		switch (op.kind) {
 			case Local:
-				localAddr(x, store_0, store_1, store_2, store_3, store);
+				localAddr(op, store_0, store_1, store_2, store_3, store);
 				break;
 			case Static:
 				put(putstatic);
-				put2(x.adr);
+				put2(op.adr);
 				break;
 			case Fld:
 				put(putfield);
-				put2(x.adr);
+				put2(op.adr);
 				break;
 			case Elem:
-				if (x.type == Tab.charType) {
+				if (op.type == Tab.charType) {
 					put(bastore);
 				} else {
 					put(astore);
@@ -164,5 +165,37 @@ public final class CodeImpl extends Code {
 		increment(op, -1);
 	}
 
+
+	public void call(Operand method) {
+		if (method.obj == parser.tab.lenObj) {
+			put(OpCode.arraylength);
+		} else if (method.obj == parser.tab.chrObj) {
+		} else if (method.obj == parser.tab.ordObj) {
+		} else {
+			put(OpCode.call);
+			put2(method.adr - (pc - 1));
+		}
+		method.kind = Operand.Kind.Stack;
+	}
+
+	public void enterMethod(Obj method, int currScopeVars) {
+		if (method != null && method.kind == Obj.Kind.Meth) {
+			method.adr = pc;
+			put(OpCode.enter);
+			put(method.nPars);
+			put(currScopeVars);
+		}
+	}
+
+
+	public void exitMethod(Obj method) {
+		if (method.type == Tab.noType) {
+			put(OpCode.exit);
+			put(OpCode.return_);
+		} else {
+			put(OpCode.trap);
+			put(1);
+		}
+	}
 
 }
