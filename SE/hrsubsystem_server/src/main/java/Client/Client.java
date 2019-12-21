@@ -19,6 +19,8 @@ public class Client extends Application {
         AnchorPane vBox = loader.load();
         Controller controller = loader.getController();
         Scene scene = new Scene(vBox);
+        RestClient r = new RestClient();
+        System.out.println(r.convertToJson());
         primaryStage.setScene(scene);
         primaryStage.show();
     }
