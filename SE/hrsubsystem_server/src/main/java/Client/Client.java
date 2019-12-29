@@ -15,6 +15,7 @@ public class Client extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         FXMLLoader loader = new FXMLLoader();
+        System.out.println("blah");
         loader.setLocation(getClass().getResource("/Client.fxml"));
         AnchorPane vBox = loader.load();
         Controller controller = loader.getController();

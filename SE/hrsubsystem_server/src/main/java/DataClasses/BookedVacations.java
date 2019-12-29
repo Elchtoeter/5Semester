@@ -1,22 +1,24 @@
 package DataClasses;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.*;
 
 public class BookedVacations implements Serializable {
-    private final Date start;
-    private final Date end;
+    private final LocalDate start;
+    private final LocalDate end;
+    private final long uid;
 
-    public BookedVacations(Date start, Date end) {
+    public BookedVacations(LocalDate start, LocalDate end, long uid) {
         this.start = start;
         this.end = end;
+        this.uid = uid;
     }
 
-    public Date getStart() {
+    public LocalDate getStart() {
         return start;
     }
 
-    public Date getEnd() {
+    public LocalDate getEnd() {
         return end;
     }
 }

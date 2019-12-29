@@ -1,0 +1,10 @@
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+<form action="#" th:action="@{/adduser}" th:object="${employee}" method="post">
+    <label for="name">Name</label>
+    <input type="text" th:field="*{name}" id="name" placeholder="Name">
+    <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
+    <label for="dob">Date of Birth</label>
+    <input type="date" th:field="*{dob}" id="dob" placeholder="Date of Birth">
+    <span th:if="${#fields.hasErrors('dob')}" th:errors="*{dob}"></span>
+    <input type="submit" value="Update User">
+</form>

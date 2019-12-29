@@ -9,6 +9,11 @@ public class Pay implements Serializable {
 
     private Currency currency;
     private BigDecimal pay;
+    private final long uid;
+
+    public Pay(long uid) {
+        this.uid = uid;
+    }
 
     public void setPay(BigDecimal pay){
         this.pay = pay;

@@ -1,31 +1,36 @@
 package DataClasses;
 
 import java.io.Serializable;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class User implements Serializable {
 
-    public User(Role role, String name, Date dateOfBirth, Pay pay, Vacation vacation, EmploymentStatus status) {
+    private final Role role;
+    private final String name;
+    private final LocalDate dateOfBirth;
+    private final Pay pay;
+    private final List<BookedVacations> vacations;
+    private final long uid;
+    private final int daysLeft;
+    private final EmploymentStatus status;
+
+    public User(Role role, String name, LocalDate dateOfBirth, Pay pay, int daysLeft, EmploymentStatus status) {
         this.role = role;
         this.name = name;
         this.dateOfBirth = dateOfBirth;
         this.pay = pay;
-        this.vacation = vacation;
+        this.daysLeft = daysLeft;
+        this.vacations = new ArrayList<>();
         this.status = status;
         uid = 0;
     }
 
-    public static enum Role {
-        USER, SUPERUSER
+    public int getDaysLeft() {
+        return daysLeft;
     }
-
-    private final Role role;
-    private final String name;
-    private final Date dateOfBirth;
-    private final Pay pay;
-    private final Vacation vacation;
-    private final long uid;
-    private final EmploymentStatus status;
 
     public Role getRole() {
         return role;
@@ -35,7 +40,7 @@ public class User implements Serializable {
         return name;
     }
 
-    public Date getDateOfBirth() {
+    public LocalDate getDateOfBirth() {
         return dateOfBirth;
     }
 
@@ -43,8 +48,8 @@ public class User implements Serializable {
         return pay;
     }
 
-    public Vacation getVacation() {
-        return vacation;
+    public List<BookedVacations> getVacation() {
+        return vacations;
     }
 
     public long getUid() {
@@ -53,5 +58,9 @@ public class User implements Serializable {
 
     public EmploymentStatus getStatus() {
         return status;
+    }
+
+    public enum Role {
+        USER, SUPERUSER
     }
 }
