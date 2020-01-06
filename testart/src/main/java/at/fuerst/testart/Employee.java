@@ -1,6 +1,5 @@
 package at.fuerst.testart;
 
-
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
@@ -22,7 +21,7 @@ public class Employee {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate dob;
     private int pay;
-    private String employed;
+    private Status employed;
 
     @OneToMany(
             mappedBy = "employee",
@@ -71,11 +70,11 @@ public class Employee {
         this.pay = pay;
     }
 
-    public String getEmployed() {
+    public Status getEmployed() {
         return employed;
     }
 
-    public void setEmployed(String employed) {
+    public void setEmployed(Status employed) {
         this.employed = employed;
     }
 }

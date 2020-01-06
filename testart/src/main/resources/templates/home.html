@@ -1,17 +1,39 @@
 <html xmlns:th="http://www.w3.org/1999/xhtml">
-<head><title>Home Page</title></head>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>HR Subsystem</title>
+    <style>
+        table {
+            font-family: arial, sans-serif;
+            border-collapse: collapse;
+            width: 50%;
+        }
+
+        td, th {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #dddddd;
+        }
+    </style>
+</head>
 <body>
-<h1>Hello !</h1>
-<p>Welcome to <span th:text="${appName}">Our App</span></p>
+<h1>Employee Management</h1>
 <div th:switch="${employees}">
     <h2 th:case="null">No users yet!</h2>
     <div th:case="*">
-        <h2>Users</h2>
+        <h2>Employees</h2>
         <table>
             <thead>
             <tr>
                 <th>Name</th>
                 <th>Date of Birth</th>
+                <th>Pay</th>
+                <th>Employment Status</th>
                 <th>Edit</th>
                 <th>Delete</th>
             </tr>
@@ -20,6 +42,8 @@
             <tr th:each="user : ${employees}">
                 <td th:text="${user.name}"></td>
                 <td th:text="${user.dob}"></td>
+                <td th:text="${user.pay}"></td>
+                <td th:text="${user.employed?.displayValue}"></td>
                 <td><a th:href="@{/edit/{id}(id=${user.employee_id})}">Edit</a></td>
                 <td><a th:href="@{/delete/{id}(id=${user.employee_id})}">Delete</a></td>
             </tr>
