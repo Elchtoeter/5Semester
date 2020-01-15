@@ -1,4 +1,4 @@
-package at.fuerst.testart;
+package at.fuerst.hrsubsystem;
 
 import org.springframework.format.annotation.DateTimeFormat;
 

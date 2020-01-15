@@ -11,7 +11,7 @@
     <groupId>at.fuerst</groupId>
     <artifactId>testart</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>testart</name>
+    <name>hrSubSystem</name>
     <description>SpringBootTest</description>
 
     <properties>

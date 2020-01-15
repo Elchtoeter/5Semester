@@ -1,4 +1,4 @@
-package at.fuerst.testart;
+package at.fuerst.hrsubsystem;
 
 import org.apache.tomcat.dbcp.dbcp2.BasicDataSource;
 import org.springframework.context.annotation.Bean;
@@ -20,7 +20,7 @@ public class HibernateConf {
     public LocalSessionFactoryBean sessionFactory() {
         LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
         sessionFactory.setDataSource(dataSource());
-        sessionFactory.setPackagesToScan("at.fuerst.testart");
+        sessionFactory.setPackagesToScan("at.fuerst.hrsubsystem");
         sessionFactory.setHibernateProperties(hibernateProperties());
         return sessionFactory;
     }
@@ -29,9 +29,9 @@ public class HibernateConf {
     public DataSource dataSource() {
         BasicDataSource dataSource = new BasicDataSource();
         dataSource.setDriverClassName("org.apache.derby.jdbc.EmbeddedDriver");
-        dataSource.setUrl("jdbc:derby:/test/testdb;create=true");
-        dataSource.setUsername("sa");
-        dataSource.setPassword("sa");
+        dataSource.setUrl("jdbc:derby:memory:testDB;create=true");
+        dataSource.setUsername("admin");
+        dataSource.setPassword("password");
         return dataSource;
     }
 

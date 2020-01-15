@@ -1,4 +1,4 @@
-package at.fuerst.testart;
+package at.fuerst.hrsubsystem;
 
 import javax.persistence.*;
 import java.time.LocalDate;

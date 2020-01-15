@@ -1,14 +1,47 @@
-<html xmlns:th="http://www.w3.org/1999/xhtml">
-<form action="#" th:action="@{/adduser}" th:object="${employee}" method="post">
-    <label for="name">Name</label>
-    <input type="text" th:field="*{name}" id="name" placeholder="Name">
-    <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
-    <label for="dob">Date of Birth</label>
-    <input type="date" th:field="*{dob}" id="dob" placeholder="Date of Birth">
-    <span th:if="${#fields.hasErrors('dob')}" th:errors="*{dob}"></span>
-    <select name="employed">
-        <option th:each="statusOpt : ${T(at.fuerst.testart.Status).values()}"
-                th:value="${statusOpt}" th:text="${statusOpt}"></option>
-    </select>
-    <input type="submit" value="Update User">
-</form>
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>HR Subsystem</title>
+    <style>
+        table {
+            font-family: arial, sans-serif;
+            border-collapse: collapse;
+            width: 50%;
+        }
+        td, th {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+        tr:nth-child(even) {
+            background-color: #dddddd;
+        }
+    </style>
+</head>
+<body>
+<div class="container my-5">
+    <h2 class="mb-5">Update User</h2>
+    <form action="#" th:action="@{/adduser}" th:object="${employee}" method="post">
+        <label for="name">Name</label>
+        <input type="text" th:field="*{name}" id="name" placeholder="Name">
+        <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
+        <label for="dob">Date of Birth</label>
+        <input type="date" th:field="*{dob}" id="dob" placeholder="Date of Birth">
+        <label for="pay">Pay</label>
+        <input type="text" th:field="*{pay}" id="pay" placeholder="Pay">
+        <span th:if="${#fields.hasErrors('pay')}" th:errors="*{pay}"></span>
+        <select name="employed">
+            <option th:each="statusOpt : ${T(at.fuerst.hrsubsystem.Status).values()}"
+                    th:value="${statusOpt}" th:text="${statusOpt}"></option>
+        </select>
+        <div class="row">
+            <div class="col-md-6 mt-5">
+                <input type="submit" value="Update User">
+            </div>
+        </div>
+    </form>
+</div>
+</body>
+</html>

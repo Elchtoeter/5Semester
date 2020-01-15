@@ -1,4 +1,4 @@
-package at.fuerst.testart;
+package at.fuerst.hrsubsystem;
 
 public enum Status {
     EMPLOYED("Employed"),

@@ -1,4 +1,4 @@
-package at.fuerst.testart;
+package at.fuerst.hrsubsystem;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
