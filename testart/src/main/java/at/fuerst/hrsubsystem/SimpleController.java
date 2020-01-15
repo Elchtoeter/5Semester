@@ -2,13 +2,12 @@ package at.fuerst.hrsubsystem;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 
@@ -83,4 +82,13 @@ public class SimpleController {
         model.addAttribute("users", employeeRepository.findAll());
         return "redirect:/home";
     }
+
+    @RequestMapping("/status")
+    public @ResponseBody EmployeeStatus getEmployeeStatus(@RequestParam("id")long id){
+        Employee emp = employeeRepository.findById(id).orElseThrow(()-> new ResponseStatusException(
+                HttpStatus.NOT_FOUND, "entity not found"
+        ));
+        return new EmployeeStatus(emp.getEmployed(),emp.getEmployee_id());
+    }
+
 }

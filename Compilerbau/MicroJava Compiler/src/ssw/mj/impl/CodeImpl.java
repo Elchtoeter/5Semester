@@ -18,6 +18,25 @@ public final class CodeImpl extends Code {
 		super(p);
 	}
 
+	private static OpCode opCodeFromComp(CompOp comp) {
+		switch (comp) {
+			case eq:
+				return OpCode.jeq;
+			case ne:
+				return OpCode.jne;
+			case gt:
+				return OpCode.jgt;
+			case ge:
+				return OpCode.jge;
+			case lt:
+				return OpCode.jlt;
+			case le:
+				return OpCode.jle;
+			default:
+				throw new IllegalArgumentException("Unexpected CompOperator " + comp);
+		}
+	}
+
 	public void loadNoStack(Operand op) {
 		switch (op.kind) {
 			case Con:
@@ -128,6 +147,22 @@ public final class CodeImpl extends Code {
 			default:
 				parser.error(NO_VAL);
 		}
+	}
+
+	public void jump(LabelImpl lab) {
+		put(OpCode.jmp);
+		lab.put();
+	}
+
+
+	public void tJump(Operand x) {
+		put(opCodeFromComp(x.op));
+		x.tLabel.put();
+	}
+
+	public void fJump(Operand x) {
+		put(opCodeFromComp(CompOp.invert(x.op)));
+		x.fLabel.put();
 	}
 
 	public void assign(Operand x, Operand y) {
