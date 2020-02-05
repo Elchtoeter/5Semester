@@ -1,0 +1,97 @@
+import java.util.ArrayList;
+import java.util.HashMap;
+
+COMPILER Recipes
+
+abstract class Thing{
+    public String name;
+    public abstract float getPrice();
+}
+
+class AtomicThing extends Thing{
+    private final float price;
+    public AtomicThing(float price){
+        this.price = price;
+    }
+    @Override
+    public float getPrice(){
+        return price;
+    }
+}
+
+class ComplexThing extends Thing{
+    private final ArrayList<Thing> things = new ArrayList<>();
+    private float price = 0;
+    public void addThing(Thing thing){
+        things.add(thing);
+    }
+    @Override
+    public float getPrice(){
+        if (price == 0){
+            for (Thing thing: things) {
+                if (thing != null)
+                    price += thing.getPrice();
+            }
+            price *= 1.2;
+        }
+        return price;
+    }
+}
+
+HashMap<String,Thing> thingsMap = new HashMap<>();
+
+CHARACTERS
+	digit		= 	"0123456789".
+    letter		= 	'a' .. 'z' + 'A' .. 'Z'.
+	
+TOKENS
+	int = digit {digit}.
+	float = digit {digit} "." digit {digit}.
+	ident = letter {letter}.
+
+
+COMMENTS FROM "##" TO "**" NESTED
+COMMENTS FROM "//" TO "\n"
+
+IGNORE "\r" + "\n" + "\t"
+
+PRODUCTIONS
+    Recipes = (Object<out Thing thing>              (.if (thing != null)thingsMap.put(thing.name,thing);.)
+               | Price)
+               {(Object<out Thing thing>            (.if (thing != null)thingsMap.put(thing.name,thing);.)
+               | Price)}.
+    Object<out Thing thing> (.thing = null;.) = Atom<out thing> | Complex<out thing> .
+    Complex<out Thing outThing> = ident            (.outThing = null;
+                                                    ComplexThing ct = new ComplexThing();
+                                                    int errorcount = 0;
+                                                    ct.name = t.val;.)
+                        "{" Recipe<out Thing thing> (.int times = 1;.)
+                         ["x" int                   (.times = Integer.parseInt(t.val);.)
+                         ]                          (.if (thing != null){
+                                                        for(int i = 0; i< times;i++){
+                                                            ct.addThing(thing);}
+                                                    } else errorcount++;.)
+                        {"," Recipe<out thing>      (.times = 1;.)
+                        ["x" int                    (.times = Integer.parseInt(t.val);.)
+                        ]                           (.if (thing != null){
+                                                        for(int i = 0; i< times;i++){
+                                                            ct.addThing(thing);}
+                                                    } else errorcount++;.)
+                        } "}"                       (.if (errorcount==0)
+	                                                    outThing = ct;.)
+                        .
+    Atom<out Thing at> = "atom" ident               (. String name = t.val; .)
+                        ":" float                   (.at = new AtomicThing(Float.parseFloat(t.val)); at.name = name;.)
+                        .
+    Recipe<out Thing thing> = ident                (.thing = thingsMap.get(t.val);
+                                                    if (thing == null)SemErr("no such recipe");.)
+                              .
+    Price = "priceof" ident                         (. String name = t.val;
+                                                    Thing thing = thingsMap.get(name);
+                                                     if (thing==null){
+                                                        SemErr("Object "+name+" not found!");
+                                                     } else {
+                                                        System.out.println(name+": "+thing.getPrice());
+                                                     }.)
+             .
+END Recipes.

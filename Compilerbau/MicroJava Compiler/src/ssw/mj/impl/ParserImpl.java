@@ -5,18 +5,22 @@ import ssw.mj.Parser;
 import ssw.mj.Scanner;
 import ssw.mj.Token.Kind;
 import ssw.mj.codegen.Code;
+import ssw.mj.codegen.Code.CompOp;
 import ssw.mj.codegen.Operand;
 import ssw.mj.symtab.Obj;
 import ssw.mj.symtab.Struct;
 import ssw.mj.symtab.Tab;
 
 import java.util.EnumSet;
+import java.util.Iterator;
+import java.util.Stack;
 
 import static ssw.mj.Errors.Message.*;
 import static ssw.mj.Token.Kind.print;
 import static ssw.mj.Token.Kind.read;
 import static ssw.mj.Token.Kind.*;
 import static ssw.mj.codegen.Code.OpCode.*;
+import static ssw.mj.symtab.Obj.Kind.Type;
 
 public final class ParserImpl extends Parser {
 
@@ -24,11 +28,9 @@ public final class ParserImpl extends Parser {
             (assign, plusas, minusas, timesas, slashas, remas);
     private static final EnumSet<Kind> firstTSExpr = EnumSet.of
             (minus, ident, number, charConst, Kind.new_, lpar);
-    private static final EnumSet<Kind> firstTSRelOp = EnumSet.of
-            (eql, neq, gtr, geq, lss, leq);
 
     private static final EnumSet<Kind> catchDecl = EnumSet.of(eof, final_, class_, lbrace, semicolon);
-    private static final EnumSet<Kind> catchStat = EnumSet.of(eof, if_, while_, break_, compare_, read, print, semicolon);
+    private static final EnumSet<Kind> catchStat = EnumSet.of(eof, if_, while_, break_, compare_, read, print, semicolon, compare_);
 
 
     private static final int MIN_ERROR_DIST = 3;
@@ -104,18 +106,21 @@ public final class ParserImpl extends Parser {
         } else {
             code.mainpc = main.adr;
         }
-        check(rbrace);
+
         program.locals = tab.curScope.locals();
+        check(rbrace);
+        code.dataSize = tab.curScope.nVars();
         tab.closeScope();
     }
 
     private void recoverDecl() {
         error(INVALID_DECL);
-        while (true){
+        while (true) {
             scan();
-           if(catchDecl.contains(sym))
-               if (sym != ident || tab.find(t.str).kind == Obj.Kind.Type) {
-               break;}
+            if (catchDecl.contains(sym))
+                if (sym != ident || tab.find(t.str).kind == Type) {
+                    break;
+                }
         }
         if (sym == semicolon) {
             scan();
@@ -125,7 +130,7 @@ public final class ParserImpl extends Parser {
     private void ClassDecl() {
         scan();
         check(ident);
-        Obj clas = tab.insert(Obj.Kind.Type, t.str, new StructImpl(Struct.Kind.Class));
+        Obj clas = tab.insert(Type, t.str, new StructImpl(Struct.Kind.Class));
         tab.openScope();
         check(lbrace);
         while (sym == ident) {
@@ -176,7 +181,7 @@ public final class ParserImpl extends Parser {
     private StructImpl Type() {
         check(ident);
         Obj slo = tab.find(t.str);
-        if (slo.kind != Obj.Kind.Type) {
+        if (slo.kind != Type) {
             error(NO_TYPE);
         }
         StructImpl type = slo.type;
@@ -227,7 +232,7 @@ public final class ParserImpl extends Parser {
         }
         code.dataSize = tab.curScope.nVars();
         code.enterMethod(method, tab.curScope.nVars());
-        Block(method);
+        Block(method, new Stack<>());
         method.locals = tab.curScope.locals();
         code.exitMethod(method);
         tab.closeScope();
@@ -235,8 +240,8 @@ public final class ParserImpl extends Parser {
 
     private void recoverMeth() {
         error(METH_DECL);
-        while (sym != eof && sym != void_ &&
-                sym != ident && tab.find(sym.label()).kind != Obj.Kind.Type) {
+        while (sym != eof && sym != void_ && sym != ident
+                && tab.find(sym.label()).kind != Type) {
             scan();
         }
     }
@@ -251,15 +256,15 @@ public final class ParserImpl extends Parser {
         } while (true);
     }
 
-    private void Block(Obj currMethod) {
+    private void Block(Obj currMethod, Stack<LabelImpl> breakLabels) {
         check(lbrace);
         while (sym != rbrace && sym != eof) {
-            Statement(currMethod);
+            Statement(currMethod, breakLabels);
         }
         check(rbrace);
     }
 
-    private void Statement(Obj currMethod) {
+    private void Statement(Obj currMethod, Stack<LabelImpl> breakLabels) {
         switch (sym) {
             case ident:
                 final Operand designator = Designator();
@@ -284,8 +289,8 @@ public final class ParserImpl extends Parser {
                 } else {
                     switch (sym) {
                         case lpar:
-                            if (designator.kind != Operand.Kind.Meth) error(NO_METH);
-                            ActPars();
+                            ActPars(designator);
+                            code.call(designator);
                             if (designator.type != Tab.noType) code.put(pop);
                             break;
                         case pplus:
@@ -310,37 +315,70 @@ public final class ParserImpl extends Parser {
             case if_:
                 scan();
                 check(lpar);
-                Condition();
+                Operand condition = Condition();
                 check(rpar);
-                Statement(currMethod);
+                final LabelImpl endLabel = new LabelImpl(code);
+                code.fJump(condition);
+                condition.tLabel.here();
+                Statement(currMethod, breakLabels);
                 if (sym == else_) {
                     scan();
-                    Statement(currMethod);
+                    code.jump(endLabel);
+                    condition.fLabel.here();
+                    Statement(currMethod, breakLabels);
+                } else {
+                    condition.fLabel.here();
                 }
+                endLabel.here();
                 break;
             case while_:
                 scan();
                 check(lpar);
-                Condition();
+                final LabelImpl topLabel = new LabelImpl(code);
+                topLabel.here();
+                final Operand whileCond = Condition();
                 check(rpar);
-                Statement(currMethod);
+                code.fJump(whileCond);
+                whileCond.tLabel.here();
+                breakLabels.push(whileCond.fLabel);
+                Statement(currMethod, breakLabels);
+                code.jump(topLabel);
+                breakLabels.pop().here();
                 break;
             case break_:
                 scan();
+                if (breakLabels.isEmpty()) error(Errors.Message.NO_LOOP);
+                else code.jump(breakLabels.peek());
+
                 check(semicolon);
                 break;
             case compare_:
                 scan();
                 check(lpar);
-                Operand exp = Expr();
-                if (exp.type != Tab.intType) error(NO_INT_OP);
+                final LabelImpl endL = new LabelImpl(code);
+                final Operand lessThan = new Operand(CompOp.lt, code);
+                final Operand equals = new Operand(CompOp.eq, code);
+                final Operand expX = Expr();
+                if (expX.type != Tab.intType) error(NO_INT_OP);
+                code.load(expX);
                 check(comma);
-                exp = Expr();
-                if (exp.type != Tab.intType) error(NO_INT_OP);
+                final Operand expY = Expr();
+                if (expY.type != Tab.intType) error(NO_INT_OP);
+                code.load(expY);
+                code.put(dup2);
+                code.fJump(lessThan);
                 check(rpar);
-                Block(currMethod);
-                Block(currMethod);
-                Block(currMethod);
+                Block(currMethod, breakLabels);
+                code.put(pop);
+                code.put(pop);
+                code.jump(endL);
+                lessThan.fLabel.here();
+                code.fJump(equals);
+                Block(currMethod, breakLabels);
+                code.jump(endL);
+                equals.fLabel.here();
+                Block(currMethod, breakLabels);
+                endL.here();
                 break;
             case return_:
                 scan();
@@ -384,7 +422,6 @@ public final class ParserImpl extends Parser {
                     check(number);
                     width = t.val;
                 }
-
                 switch (expr.type.kind) {
                     case Int:
                         code.load(expr);
@@ -404,7 +441,7 @@ public final class ParserImpl extends Parser {
                 check(semicolon);
                 break;
             case lbrace:
-                Block(currMethod);
+                Block(currMethod, breakLabels);
                 break;
             case semicolon:
                 scan();
@@ -423,6 +460,7 @@ public final class ParserImpl extends Parser {
         if (sym == semicolon) {
             scan();
         }
+        errorDist = 0;
     }
 
     private Code.OpCode Assignop() {
@@ -452,45 +490,108 @@ public final class ParserImpl extends Parser {
     }
 
 
-    private void ActPars() {
+    private void ActPars(Operand meth) {
         check(lpar);
+
+        if (meth.kind != Operand.Kind.Meth) {
+            error(Errors.Message.NO_METH);
+            meth.obj = tab.noObj;
+        }
+
+        int actPars = 0, formPars = meth.obj.nPars;
+
+        Iterator<Obj> parameters = meth.obj.locals.values().iterator();
+
         if (firstTSExpr.contains(sym)) {
-            Expr();
+            Operand op = Expr();
+            code.load(op);
+            actPars++;
+
+            if (parameters.hasNext()
+                    && !op.type.assignableTo(parameters.next().type))
+                error(Errors.Message.PARAM_TYPE);
+
             while (sym == comma) {
                 scan();
-                Expr();
+
+                op = Expr();
+                code.load(op);
+                actPars++;
+
+                if (parameters.hasNext()
+                        && !op.type.assignableTo(parameters.next().type))
+                    error(Errors.Message.PARAM_TYPE);
             }
         }
+
+        if (actPars > formPars)
+            error(Errors.Message.MORE_ACTUAL_PARAMS);
+        else if (actPars < formPars)
+            error(Errors.Message.LESS_ACTUAL_PARAMS);
+
         check(rpar);
     }
 
-    private void Condition() {
-        CondTerm();
+    private Operand Condition() {
+        final Operand cTerm = CondTerm();
         while (sym == or) {
+            code.tJump(cTerm);
             scan();
-            CondTerm();
+            cTerm.fLabel.here();
+            final Operand secondTerm = CondTerm();
+            cTerm.fLabel = secondTerm.fLabel;
+            cTerm.op = secondTerm.op;
         }
+        return cTerm;
     }
 
-    private void CondTerm() {
-        CondFact();
+    private Operand CondTerm() {
+        final Operand cFact = CondFact();
         while (sym == and) {
+            code.fJump(cFact);
             scan();
-            CondFact();
+            final Operand secondFact = CondFact();
+            cFact.op = secondFact.op;
         }
+        return cFact;
     }
 
-    private void CondFact() {
-        Expr();
-        Relop();
-        Expr();
+    private Operand CondFact() {
+        final Operand expr = Expr();
+        code.load(expr);
+        final CompOp comp = Relop();
+        final Operand secondExp = Expr();
+        code.load(secondExp);
+
+        if (!expr.type.compatibleWith(secondExp.type)) error(INCOMP_TYPES);
+        if ((expr.type.isRefType() || secondExp.type.isRefType()) && !(comp == CompOp.eq || comp == CompOp.ne))
+            error(EQ_CHECK);
+
+        return new Operand(comp, code);
     }
 
-    private void Relop() {
-        if (firstTSRelOp.contains(sym))
+    private CompOp Relop() {
+        if (sym == eql) {
             scan();
-        else
-            error(REL_OP);
+            return CompOp.eq;
+        } else if (sym == neq) {
+            scan();
+            return CompOp.ne;
+        } else if (sym == gtr) {
+            scan();
+            return CompOp.gt;
+        } else if (sym == geq) {
+            scan();
+            return CompOp.ge;
+        } else if (sym == lss) {
+            scan();
+            return CompOp.lt;
+        } else if (sym == leq) {
+            scan();
+            return CompOp.le;
+        }
+        error(Errors.Message.REL_OP);
+        return CompOp.eq;
     }
 
     private Operand Expr() {
@@ -526,6 +627,7 @@ public final class ParserImpl extends Parser {
 
     private Operand Term() {
         final Operand factor = Factor();
+
         while (sym == times || sym == slash || sym == Kind.rem) {
             final Code.OpCode opCode = Mulop();
             code.load(factor);
@@ -538,86 +640,92 @@ public final class ParserImpl extends Parser {
     }
 
     private Operand Factor() {
-        Operand f;
+        Operand x;
         switch (sym) {
             case ident:
-                f = Designator();
+                x = Designator();
                 if (sym == lpar) {
-                    if (f.obj.type == Tab.noType) error(INVALID_CALL);
-                    if (f.kind != Operand.Kind.Meth) error(NO_METH);
-                    ActPars();
-                    code.call(f);
+                    if (x.obj.type == Tab.noType) error(INVALID_CALL);
+                    ActPars(x);
+                    code.call(x);
                 }
                 break;
             case number:
                 scan();
-                f = new Operand(t.val);
+                x = new Operand(t.val);
+                x.type = Tab.intType;
                 break;
             case charConst:
                 scan();
-                f = new Operand(t.val);
-                f.type = Tab.charType;
+                x = new Operand(t.val);
+                x.type = Tab.charType;
                 break;
             case new_:
                 scan();
                 check(ident);
+
                 final Obj obj = tab.find(t.str);
-                if (obj.kind != Obj.Kind.Type) error(NO_TYPE);
+                if (obj.kind != Type) error(NO_TYPE);
                 StructImpl type = obj.type;
+
                 if (sym == lbrack) {
                     scan();
                     final Operand size = Expr();
                     if (size.type != Tab.intType) error(ARRAY_SIZE);
+
                     code.load(size);
-                    code.put(newarray);
+                    code.put(Code.OpCode.newarray);
+
                     code.put(type == Tab.charType ? 0 : 1);
+
                     type = new StructImpl(type);
                     check(rbrack);
                 } else if (type.kind == Struct.Kind.Class) {
                     code.put(Code.OpCode.new_);
                     code.put2(obj.type.nrFields());
                 } else error(NO_CLASS_TYPE);
-                f = new Operand(type);
+
+                x = new Operand(type);
                 break;
             case lpar:
                 scan();
-                f = Expr();
+                x = Expr();
                 check(rpar);
                 break;
             default:
                 error(INVALID_FACT);
-                f = new Operand(0);
+                x = new Operand(Tab.noType);
                 break;
         }
-        return f;
+        return x;
     }
 
     private Operand Designator() {
         check(ident);
-        Operand d = new Operand(tab.find(t.str), this);
+        Operand des = new Operand(tab.find(t.str), this);
         while (true) {
             if (sym == period) {
-                if (d.type.kind != Struct.Kind.Class) error(NO_CLASS);
+                if (des.type.kind != Struct.Kind.Class) error(NO_CLASS);
                 scan();
-                code.load(d);
+                code.load(des);
                 check(ident);
-                final Obj obj = tab.findMember(t.str, d.type);
-                d.kind = Operand.Kind.Fld;
-                d.type = obj.type;
-                d.adr = obj.adr;
+                final Obj obj = tab.findMember(t.str, des.type);
+                des.kind = Operand.Kind.Fld;
+                des.type = obj.type;
+                des.adr = obj.adr;
             } else if (sym == lbrack) {
-                code.load(d);
+                code.load(des);
                 scan();
                 final Operand index = Expr();
-                if (d.obj != null || d.type.kind != Struct.Kind.Arr) error(NO_ARRAY);
+                if (des.obj != null || des.type.kind != Struct.Kind.Arr) error(NO_ARRAY);
                 if (index.type != Tab.intType) error(ARRAY_INDEX);
                 code.load(index);
-                d.kind = Operand.Kind.Elem;
-                d.type = d.type.elemType;
+                des.kind = Operand.Kind.Elem;
+                des.type = des.type.elemType;
                 check(rbrack);
             } else break;
         }
-        return d;
+        return des;
     }
 
     private Code.OpCode Addop() {
