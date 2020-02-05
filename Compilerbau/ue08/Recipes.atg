@@ -3,12 +3,12 @@ import java.util.HashMap;
 
 COMPILER Recipes
 
-public abstract class Thing{
+abstract class Thing{
     public String name;
     public float getPrice();
 }
 
-public class AtomicThing extends Thing{
+class AtomicThing extends Thing{
     private final float price;
     public AtomicThing(float price){
         this.price = price;
@@ -19,8 +19,8 @@ public class AtomicThing extends Thing{
     }
 }
 
-public class ComplexThing extends Thing{
-    private ArrayList<Thing> things = new ArrayList<>();
+class ComplexThing extends Thing{
+    private final ArrayList<Thing> things = new ArrayList<>();
     private float price;
     public void addThing(Thing thing){
         things.add(thing);
@@ -36,9 +36,6 @@ public class ComplexThing extends Thing{
         }
         return price;
     }
-public class PriceQuery{
-}
-
 }
 
 HashMap<String,Thing> thingsMap = new HashMap<>();
@@ -59,10 +56,31 @@ COMMENTS FROM "//" TO "\n"
 IGNORE "\r" + "\n" + "\t"
 
 PRODUCTIONS
-    Recipes = (Object | Price) {(Object | Price)}.
-    Complex = ident "{" Object ["x" int] {"," Object ["x" int]} "}".
-    Object = Atom | Complex .
-    Atom = "atom" ident":" float.
-    Price = "priceof" ident.
-
+    Recipes = (Object<out Thing thing>              (.thingsMap.put(thing.name,thing);.)
+               | Price)
+               {(Object<out thing>                  (.thingsMap.put(thing.name,thing);.)
+               | Price)}.
+    Object<out Thing> = Atom<out Thing thing> | Complex<out thing> .
+    Complex<out Thing> = ident                      (.ComplexThing ct = new ComplexThing();
+                                                    ct.name = t.val;.)
+                        "{" Object<out Thing thing> (.int times = 1;.)
+                         ["x" int                   (.times = Integer.parseInt(t.val);.)
+                         ]                          (.for(int i = 0; i< times;i++){
+                                                        ct.addThing(thing);}.)
+                        {"," Object<out thing>      (.int times = 1;.)
+                        ["x" int                    (.times = Integer.parseInt(t.val);.)
+                        ]                           (.for(int i = 0; i< times;i++){
+                                                    ct.addThing(thing);}.)
+                        } "}".
+    Atom<out Thing> = "atom" ident                  (. String name = t.val; .)
+                        ":" float                   (. AtomicThing at = new AtomicThing(t.val); at.name = name;.)
+                        .
+    Price = "priceof" ident                         (. String name = t.val;
+                                                    Thing t = thingsMap.get(name);
+                                                     if (t==null){
+                                                        SemErr("Object "+name+" not found!");
+                                                     } else {
+                                                        System.out.println(name+": "+thing.getPrice());
+                                                     }.)
+             .
 END Recipes.

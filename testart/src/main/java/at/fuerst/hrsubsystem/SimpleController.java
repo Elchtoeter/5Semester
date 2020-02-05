@@ -88,7 +88,16 @@ public class SimpleController {
         Employee emp = employeeRepository.findById(id).orElseThrow(()-> new ResponseStatusException(
                 HttpStatus.NOT_FOUND, "entity not found"
         ));
-        return new EmployeeStatus(emp.getEmployed(),emp.getEmployee_id());
+        return new EmployeeStatus(emp.getEmployed().getDisplayValue(),emp.getEmployee_id());
     }
 
+    private class EmployeeStatus {
+        public final String employed;
+        public final long id;
+
+        private EmployeeStatus(String employed, long id) {
+            this.employed = employed;
+            this.id = id;
+        }
+    }
 }
