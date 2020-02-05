@@ -1,0 +1,31 @@
+atom Holzstiel: 1.30
+atom Eisenkette: 1.8
+atom Watte: 0.1
+atom Stoff: 0.1
+
+Nunchaku { Holzstiel x 2, Eisenkette }
+Teddy { Stoff x 5, Watte x 10 }
+Riesenteddy { Stoff x 20, Watte x 80}
+Geburstagskiste { Teddy x 3, Riesenteddy x 1 }
+Wattepad { Watte x 3}
+
+priceof Holzstiel
+priceof Eisenkette
+priceof Watte
+priceof Stoff
+priceof Nunchaku
+priceof Teddy
+priceof Riesenteddy
+priceof Geburstagskiste
+priceof Wattepad
+
+## Now some minecraft recipes...
+Taken from https://minecraft.gamepedia.com/Recipe_book **
+// I do not play minecraft, please excuse me if something is wrong
+atom Eisenbarren: 10.0
+Kuebel { Eisenbarren x 3}
+priceof Eisenbarren
+priceof Kuebel
+atom Goldbarren: 100.0
+atom Apfel: 0.9
+Goldapfel { Apfel, Goldbarren x 8}

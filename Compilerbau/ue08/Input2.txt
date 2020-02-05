@@ -1,0 +1,16 @@
+atom Holzstiel: 1.30
+
+Nunchaku { Holzstiel x 2, Eisenkette }
+
+atom Eisenkette: 1.8
+
+priceof Holzstiel
+priceof Eisenkette
+priceof Nunchaku
+
+Holzstielbundle { Holzstiel x 100 }
+TakaTuka		{ Foo x 17, Bar x 1337, Baz}
+
+priceof Holzstielset
+priceof Holzstielbundle
+priceof TakaTuka

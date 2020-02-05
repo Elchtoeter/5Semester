@@ -1,0 +1,68 @@
+import java.util.ArrayList;
+import java.util.HashMap;
+
+COMPILER Recipes
+
+public abstract class Thing{
+    public String name;
+    public float getPrice();
+}
+
+public class AtomicThing extends Thing{
+    private final float price;
+    public AtomicThing(float price){
+        this.price = price;
+    }
+    @Override
+    public float getPrice(){
+        return price;
+    }
+}
+
+public class ComplexThing extends Thing{
+    private ArrayList<Thing> things = new ArrayList<>();
+    private float price;
+    public void addThing(Thing thing){
+        things.add(thing);
+    }
+    @Override
+    public float getPrice(){
+        if (price == null){
+            price = 0;
+            for (Thing thing: things) {
+                price += thing.getPrice();
+            }
+            price *= 1.2;
+        }
+        return price;
+    }
+public class PriceQuery{
+}
+
+}
+
+HashMap<String,Thing> thingsMap = new HashMap<>();
+
+CHARACTERS
+	digit		= 	"0123456789".
+    letter		= 	'a' .. 'z' + 'A' .. 'Z'.
+	
+TOKENS
+	int = digit {digit}.
+	float = digit {digit} "." digit {digit}.
+	ident = letter {letter}.
+
+
+COMMENTS FROM "##" TO "**" NESTED
+COMMENTS FROM "//" TO "\n"
+
+IGNORE "\r" + "\n" + "\t"
+
+PRODUCTIONS
+    Recipes = (Object | Price) {(Object | Price)}.
+    Complex = ident "{" Object ["x" int] {"," Object ["x" int]} "}".
+    Object = Atom | Complex .
+    Atom = "atom" ident":" float.
+    Price = "priceof" ident.
+
+END Recipes.
